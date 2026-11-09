@@ -22,10 +22,10 @@ for name in ('msyh.ttc','msyhbd.ttc','segoeui.ttf'):
     if font.exists(): QFontDatabase.addApplicationFont(str(font))
 app.setFont(QFont('Microsoft YaHei',10))
 destination=Path(__file__).resolve().parents[1]/'assets'
-settings=dict(paks='D:/DeltaForce/DeltaForce/Content/Paks',outdir='D:/AtlasMaps',
-              ue_engine='D:/UE_5.4/Engine/Binaries/Win64/UnrealEditor.exe',
+settings=dict(paks='D:/AtlasMap-build/Game/DeltaForce/Content/Paks',outdir='D:/AtlasMaps/Export',
+              ue_engine='C:/Program Files/Epic Games/UE_5.4/Engine/Binaries/Win64/UnrealEditor.exe',
               ue_project='D:/AtlasMaps/MapProject/MapProject.uproject',
-              blender='D:/Blender/blender.exe',ue_export_base='D:/AtlasMaps/Export',
+              blender='C:/Program Files/Blender Foundation/Blender 4.2/blender.exe',ue_export_base='D:/AtlasMaps/Export',
               ue_map='CollectionRoom',parallel_export=False,parallel_processes=2)
 class Host(QWidget):
     def status(self,*args): pass
@@ -37,12 +37,12 @@ def save(widget,name):
     app.processEvents()
     assert widget.grab().save(str(destination/name))
 
-with patch.object(dfmap,'load_settings',side_effect=lambda:dict(settings)), \
-     patch.object(dfmap,'save_settings'),patch.object(dfmap,'write_exporter_config'), \
+with patch.object(exporter,'load_settings',side_effect=lambda:dict(settings)), \
+     patch.object(exporter,'save_settings'),patch.object(exporter,'write_exporter_config'), \
      patch('app.ue_page._detect_engine',return_value=settings['ue_engine']), \
      patch('app.ue_page._detect_blender',return_value=settings['blender']):
     host=Host()
-    with patch.object(dfmap,'load_presets',return_value=[]):
+    with patch.object(exporter,'load_presets',return_value=[]):
         host.map_page=MapPage(host)
     save(host.map_page,'tutorial_maps.png')
     host.map_page.hide()
