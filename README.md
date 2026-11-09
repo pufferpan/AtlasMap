@@ -31,6 +31,20 @@ powershell -ExecutionPolicy Bypass -File .\build-source.ps1 -PythonExe .\.venv\S
 
 构建产物为 `dist/AtlasMap/AtlasMap.exe`，发布时携带整个程序目录。UE 与 Blender 需另外安装并在界面中配置。
 
+### 单文件版
+
+只想拷一个 exe 就走，加一个环境变量即可：
+
+```powershell
+$env:ATLASMAP_BUILD_ONEFILE = '1'
+.\.venv\Scripts\python.exe -m PyInstaller --noconfirm AtlasMap.spec
+```
+
+产物是 `dist/AtlasMap-Standalone.exe`（约 103 MB）。它把 `runtime/` 与 `scripts/` 一起塞进
+exe，运行时解压到系统临时目录：首次双击到界面出现约 10–15 秒，退出后临时目录自动清掉；
+解压需要约 300 MB 临时空间。目录版启动更快（2–3 秒），功能完全一样。
+两个版本都从 Release 页下载：`AtlasMap-win64.zip`（目录版）与 `AtlasMap-Standalone.exe`（单文件）。
+
 完整目录、原导出核心源码和依赖说明见 [源码说明](README-source.md)。本版导出窗口动画与资源占用入口见 [界面更新说明](docs/NOTES-export-ui.md)，标准 UE 渲染的兼容边界见 [导出说明](docs/NOTES-export-rebuild.md)
 
 游戏光照兼容模式、原始参数切换、地图调校和验证范围见 [光照说明](docs/NOTES-game-lighting.md)。
