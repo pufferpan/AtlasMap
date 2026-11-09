@@ -1,0 +1,65 @@
+name: build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-build.txt
+
+      - name: 编译场景状态助手
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          dotnet publish tools\scene_state\scene-state.csproj -c Release -o scripts\tools\scene-state
+          if ($LASTEXITCODE -ne 0) { throw 'scene-state build failed' }
+          foreach ($codec in @('Detex.dll', 'zlib-ng2.dll', 'oodle-data-shared.dll')) {
+            Copy-Item -LiteralPath (Join-Path 'runtime' $codec) -Destination 'scripts\tools\scene-state' -Force
+          }
+
+      - name: 打包
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:ATLASMAP_TOOL_SOURCE = (Resolve-Path 'runtime').Path
+          python -m PyInstaller --noconfirm AtlasMap.spec
+          if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed' }
+          if (-not (Test-Path 'dist\AtlasMap\AtlasMap.exe')) { throw 'AtlasMap.exe missing' }
+          Compress-Archive -Path 'dist\AtlasMap\*' -DestinationPath 'AtlasMap-win64.zip' -Force
+          $hash = (Get-FileHash 'AtlasMap-win64.zip' -Algorithm SHA256).Hash.ToLower()
+          "$hash  AtlasMap-win64.zip" | Out-File -Encoding ascii 'AtlasMap-win64.zip.sha256'
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AtlasMap-win64
+          path: |
+            AtlasMap-win64.zip
+            AtlasMap-win64.zip.sha256
+
+      - name: 发布 Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            AtlasMap-win64.zip
+            AtlasMap-win64.zip.sha256
