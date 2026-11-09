@@ -40,10 +40,21 @@ jobs:
       - name: 打包
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
+          $ErrorActionPreference = 'Continue'
           $env:ATLASMAP_TOOL_SOURCE = (Resolve-Path 'runtime').Path
-          python -m PyInstaller --noconfirm AtlasMap.spec
-          if ($LASTEXITCODE -ne 0) { throw 'PyInstaller failed' }
+          python -m PyInstaller --noconfirm AtlasMap.spec *> build.log
+          $code = $LASTEXITCODE
+          Get-Content build.log -Tail 60
+          Get-Content build.log -Tail 2000 | Set-Content -Encoding utf8 'ci-build.log'
+          if ($code -ne 0) {
+            git config user.name 'ci'
+            git config user.email 'ci@local'
+            git checkout -B ci-build-log
+            git add -f ci-build.log
+            git commit -m 'CI 构建日志'
+            git push -f origin ci-build-log
+            throw "PyInstaller failed: $code"
+          }
           if (-not (Test-Path 'dist\AtlasMap\AtlasMap.exe')) { throw 'AtlasMap.exe missing' }
           Compress-Archive -Path 'dist\AtlasMap\*' -DestinationPath 'AtlasMap-win64.zip' -Force
           $hash = (Get-FileHash 'AtlasMap-win64.zip' -Algorithm SHA256).Hash.ToLower()
