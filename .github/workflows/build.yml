@@ -39,6 +39,9 @@ jobs:
 
       - name: 打包
         shell: pwsh
+        env:
+          PYTHONIOENCODING: utf-8
+          PYTHONUTF8: "1"
         run: |
           $ErrorActionPreference = 'Continue'
           $env:ATLASMAP_TOOL_SOURCE = (Resolve-Path 'runtime').Path

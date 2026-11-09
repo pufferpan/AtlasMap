@@ -8,6 +8,17 @@
 """
 import os
 import re
+import sys
+
+# 构建日志在中文 Windows 控制台/CI 上可能不是 UTF-8，直接 print 中文会抛
+# UnicodeEncodeError；这里把标准输出改成 utf-8 + replace，日志照打不误。
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:      # noqa: BLE001
+    pass
 
 ONEFILE = os.environ.get("ATLASMAP_BUILD_ONEFILE") == "1"
 
