@@ -866,7 +866,8 @@ class SettingsPage(QWidget):
         s = exporter.load_settings()
         self.exe_edit.setText(exporter.find_exe() or '')
         self.paks_edit.setText(str(s.get("paks") or ""))
-        self.key_edit.setText(str(s.get("keyfile") or ""))
+        # 设置里那条路径可能来自别的电脑，先显示真正能找到的那份，省得用户以为没配
+        self.key_edit.setText(exporter.resolve_keyfile(s) or str(s.get("keyfile") or ""))
         self.out_edit.setText(str(s.get("outdir") or ""))
         self.blend_edit.setText(str(s.get("blender") or ""))
         self.game_edit.setText(str(s.get("game") or "GAME_DeltaForce"))
