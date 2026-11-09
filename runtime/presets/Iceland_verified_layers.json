@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "map": "Iceland",
+  "date": "2026-10-31",
+  "stages": [
+    {
+      "id": "geometry",
+      "label": "Iceland ① 运行时静态几何",
+      "roots": [
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/BigMeshGroup/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/MidMeshGroup/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/SmallMeshGroup/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/Default/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/POIResident/"
+      ],
+      "source_report": "out/Iceland/revised/geometry/merge_report.json",
+      "historical_levels": 288,
+      "note": "分阶段基础导出，不等于完整成品。需教程中的补层、源材质与验证步骤。"
+    },
+    {
+      "id": "structures",
+      "label": "Iceland ② 结构与附加 HD 层",
+      "roots": [
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_S2.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_S3.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_S4.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_S4_HD.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_S4A.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_GuShen_HD.umap",
+        "DeltaForce/Content/Maps/Iceland/LA_Meshs/LA_Mesh_zcfw_S4.umap"
+      ],
+      "source_report": "out/Iceland/revised/structures/merge_report.json",
+      "historical_levels": 7,
+      "note": "分阶段基础导出，不等于完整成品。需教程中的补层、源材质与验证步骤。"
+    },
+    {
+      "id": "decorations",
+      "label": "Iceland ③ 装饰与地标",
+      "roots": [
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/Decorations/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/Decorations_HQ/",
+        "DeltaForce/Content/Maps/BuildMaps_HD/Iceland/Runtime/Landmark/"
+      ],
+      "source_report": "out/Iceland/revised/decorations/merge_report.json",
+      "historical_levels": 209,
+      "note": "分阶段基础导出，不等于完整成品。需教程中的补层、源材质与验证步骤。"
+    },
+    {
+      "id": "supplement",
+      "label": "Iceland ④ 交互静态与水面",
+      "roots": [
+        "DeltaForce/Content/Maps/Iceland/InterActors/",
+        "DeltaForce/Content/Maps/Iceland/InterActors_HD/",
+        "DeltaForce/Content/Maps/Iceland/ClientConfig/IceLand_Water_HD.umap"
+      ],
+      "source_report": "out/Iceland/revised/supplement/merge_report.json",
+      "historical_levels": 115,
+      "note": "分阶段基础导出，不等于完整成品。需教程中的补层、源材质与验证步骤。"
+    }
+  ]
+}

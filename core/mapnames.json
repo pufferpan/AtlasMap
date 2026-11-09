@@ -1,0 +1,130 @@
+{
+  "_source": "代号取自 pak 内 DataTables/MapInfo.uasset 与 MapThumbnailTable.uasset 的行名；显示名直接用代号，不做本地化。",
+  "_generated": "2026-11-09",
+  "maps": {
+    "Brakkesh": {
+      "cn": "Brakkesh",
+      "note": "资源系列",
+      "selectable": false
+    },
+    "Brakkesh_Long3": {
+      "cn": "Brakkesh Long3",
+      "note": "主关卡"
+    },
+    "Collapse": {
+      "cn": "Collapse"
+    },
+    "Mogadishu": {
+      "cn": "Mogadishu"
+    },
+    "Dam_Iris": {
+      "cn": "Dam Iris"
+    },
+    "Dam_Iris_Long3": {
+      "cn": "Dam Iris Long3",
+      "note": "子区域"
+    },
+    "Dam_Iris_Underground": {
+      "cn": "Dam Iris Underground",
+      "note": "子区域"
+    },
+    "Dam_Iris_Level42": {
+      "cn": "Dam Iris Level42",
+      "note": "变体"
+    },
+    "Dam_Iris_DynamicRequest": {
+      "cn": "Dam Iris DynamicRequest",
+      "note": "变体"
+    },
+    "Dam_Iris_WithEvent": {
+      "cn": "Dam Iris WithEvent",
+      "note": "变体"
+    },
+    "Dam_Iris_WithoutEvent": {
+      "cn": "Dam Iris WithoutEvent",
+      "note": "变体"
+    },
+    "SpaceCenter": {
+      "cn": "SpaceCenter"
+    },
+    "SpaceCenter_Ma1": {
+      "cn": "SpaceCenter Ma1",
+      "note": "主关卡"
+    },
+    "SpaceCenter_Level1": {
+      "cn": "SpaceCenter Level1",
+      "note": "变体"
+    },
+    "SpaceCenter_Level2": {
+      "cn": "SpaceCenter Level2",
+      "note": "变体"
+    },
+    "SpaceCenter_Level21": {
+      "cn": "SpaceCenter Level21",
+      "note": "变体"
+    },
+    "SpaceCenter_DynamicRequest": {
+      "cn": "SpaceCenter DynamicRequest",
+      "note": "变体"
+    },
+    "SpaceCenter_WithEvent_Ma1": {
+      "cn": "SpaceCenter WithEvent Ma1",
+      "note": "变体"
+    },
+    "SpaceCenter_WithoutEvent_Ma1": {
+      "cn": "SpaceCenter WithoutEvent Ma1",
+      "note": "变体"
+    },
+    "Retrowar": {
+      "cn": "Retrowar"
+    },
+    "Cracked": {
+      "cn": "Cracked"
+    },
+    "Cracked_Warehouse": {
+      "cn": "Cracked Warehouse",
+      "note": "子区域"
+    },
+    "Cracked_Breakthrough": {
+      "cn": "Cracked Breakthrough",
+      "note": "变体"
+    },
+    "Cracked_TacticalConquest": {
+      "cn": "Cracked TacticalConquest",
+      "note": "变体"
+    },
+    "BombDefusal_Dock": {
+      "cn": "BombDefusal Dock"
+    },
+    "BombDefusal_Watch": {
+      "cn": "BombDefusal Watch"
+    },
+    "BombDefusal_Mansion": {
+      "cn": "BombDefusal Mansion"
+    },
+    "BombDefusal_Cargo": {
+      "cn": "BombDefusal Cargo"
+    },
+    "SafeHouse": {
+      "cn": "SafeHouse",
+      "note": "小地图"
+    },
+    "CollectionRoom": {
+      "cn": "CollectionRoom",
+      "note": "小地图"
+    },
+    "Iceland": {
+      "cn": "Iceland"
+    }
+  },
+  "prefix_rules": [
+    {
+      "prefix": "PhysXShared_",
+      "suffix": " ·物理共享"
+    },
+    {
+      "prefix": "PhysXShared",
+      "suffix": " ·物理共享"
+    }
+  ]
+}

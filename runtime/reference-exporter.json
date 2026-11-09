@@ -1,0 +1,281 @@
+{
+  "reference": "runtime",
+  "variant": "pinned-toolchain",
+  "files": [
+    {
+      "file": "AssetRipper.TextureDecoder.dll",
+      "sha256": "d21409e8e4ae1b8c0a9f66ca172a710d5f460833f0051102d19549c4d7d09e80",
+      "bytes": 175616
+    },
+    {
+      "file": "Blake3.dll",
+      "sha256": "797ef7c1be7cd5c559e6558b47c94db5fe092deb778c878771cba51a3a6d33a3",
+      "bytes": 60416
+    },
+    {
+      "file": "BouncyCastle.Cryptography.dll",
+      "sha256": "e5eeaf6d263c493619982fd3638e6135077311d08c961e1fe128f9107d29ebc6",
+      "bytes": 4924576
+    },
+    {
+      "file": "CommunityToolkit.HighPerformance.dll",
+      "sha256": "196607c6d4d704b5ee95c80f8e3cd799595b7d8a08108701894c211b138d2839",
+      "bytes": 153928
+    },
+    {
+      "file": "CUE4Parse-Conversion.dll",
+      "sha256": "cb1d2d332dcb8ab7a8ebd028cfcf0ddd11f5568a139fea19d1bd50051e08d4a1",
+      "bytes": 1388544
+    },
+    {
+      "file": "CUE4Parse.dll",
+      "sha256": "97068796f3b4c592bd3e964500753b0db7fc1df223dc4fb8bddcd6570b39cee6",
+      "bytes": 4049408
+    },
+    {
+      "file": "Detex.dll",
+      "sha256": "a434f5759fadb73bf386e636481e4fddb29e6a2e9c177334c53770a7aba19a7e",
+      "bytes": 50176
+    },
+    {
+      "file": "dfmap.deps.json",
+      "sha256": "3e5ef6f3f93037a712adfe710fe0fb1a0f7a2ee2d1abb92a2441db4b8253b0c4",
+      "bytes": 23723
+    },
+    {
+      "file": "dfmap.dll",
+      "sha256": "f5a909824c021b27ff5a76d94e1b5a3f01db85b09d84568e9b990d327cbc6ac7",
+      "bytes": 224768
+    },
+    {
+      "file": "map-export.exe",
+      "sha256": "32cfc2d98630eba7c8513027d8b5a72cc30da86c7fffb0283f45a6e4f18b548c",
+      "bytes": 162304
+    },
+    {
+      "file": "dfmap.runtimeconfig.json",
+      "sha256": "5a3d27aa019a50e80e208d997f1987ea82f771b642cd585fb4eaedd360145104",
+      "bytes": 563
+    },
+    {
+      "file": "docs/AIգ¦Õø¥ÕñäþÉåµôìõ¢£޻¦µÄ.md",
+      "sha256": "9ded024aa7034b7aefe403e1d5d2b176ce378033ea68fd1a2e5a6b83dd20c344",
+      "bytes": 11217
+    },
+    {
+      "file": "docs/Icelandգ¦Õø¥ջ+Õç¦õ©ÄÞ+Õă޻¦µÄõ¦ª.md",
+      "sha256": "b5719885f3fcc54aa1a428981f161abddd76bf0b2b5f61202c4c3cd845b10ae9",
+      "bytes": 57740
+    },
+    {
+      "file": "docs/Icelandիîµò¦ÕñìþĦµòÖþ¿ï.md",
+      "sha256": "acadc33645899084cb9964c8e5935b037320eddbc8ce5b61414330754197990c",
+      "bytes": 24895
+    },
+    {
+      "file": "docs/README.md",
+      "sha256": "8cbe5105a3ddaf6aea0e80a7f95b0a3a4d29e39447509f862a6ca24b9dcc3f1f",
+      "bytes": 2418
+    },
+    {
+      "file": "docs/õ+«µ¡úþëêþòîÚØó.png",
+      "sha256": "473020db8a42da3701197bd07b3d5c3580acd4af9a93ae09e847b149820b495b",
+      "bytes": 54305
+    },
+    {
+      "file": "docs/ޢ»õ+Âõ+«µ¡úþëêõ¢+þö¿޻¦µÄ.md",
+      "sha256": "4846b59d38ac55b5822e285181f0e7e040e8200ecaa70c63597c093be1e18fe2",
+      "bytes": 6119
+    },
+    {
+      "file": "docs/ީ®ÕØæõ©ĵÄƵѵëïÕåî.md",
+      "sha256": "39c699b36c875d92a3c415f20c1716a72f6542527fc4a5e5e70bd34a2507b726",
+      "bytes": 14421
+    },
+    {
+      "file": "FixedMathSharp.dll",
+      "sha256": "3c0240d67a3daef47ca007b7920a81edb40ac97f01f64cc5e96b45e4e8ba7fee",
+      "bytes": 128512
+    },
+    {
+      "file": "Fmod5Sharp.dll",
+      "sha256": "5fd28433bee00c92c73763ee2ea310142197dabd86f762639e9ac04ed58168ac",
+      "bytes": 906240
+    },
+    {
+      "file": "GenericReader.dll",
+      "sha256": "92810aca50dc68d9e79361aeb96fb72e5f80104a147af39625c2bc5d0ff69d68",
+      "bytes": 28672
+    },
+    {
+      "file": "IndexRange.dll",
+      "sha256": "13b459a9725bf3ae42b26836613221468458952bf59f848b809c03ed60247fb1",
+      "bytes": 11264
+    },
+    {
+      "file": "K4os.Compression.LZ4.dll",
+      "sha256": "e282aadc2353b864fe95cd5fb525a1a093d99a30a5bf2530b7ab831d56179816",
+      "bytes": 70656
+    },
+    {
+      "file": "K4os.Compression.LZ4.Streams.dll",
+      "sha256": "b146cf3c769000cd5e4458cfed5da3c0e838b7b2da6dbe6dad458cd5a0e3ce41",
+      "bytes": 84992
+    },
+    {
+      "file": "K4os.Hash.xxHash.dll",
+      "sha256": "19d73fa58c1f6c12c61f30eaad91881bd06f50caf4b462b061bc1b45d0a577cd",
+      "bytes": 13312
+    },
+    {
+      "file": "MemoryPack.Core.dll",
+      "sha256": "6dc7785eea92dc72b9ea4d9d9b08c585ce87c11ec6b8388d00a179af694cf6be",
+      "bytes": 210432
+    },
+    {
+      "file": "Microsoft.Bcl.Memory.dll",
+      "sha256": "5dc45835016455f5b9be4101ff5726c4516e0c8fe2797a919f157d2121295656",
+      "bytes": 16136
+    },
+    {
+      "file": "NAudio.Core.dll",
+      "sha256": "fcf493fc47a2f478a65303886b975fbdbf714cbb1f2d79f7fce97e4bb16b01a8",
+      "bytes": 187904
+    },
+    {
+      "file": "Newtonsoft.Json.dll",
+      "sha256": "a28c251dfe36d881e9e2462e171441b8b0ec156fe3f452602c9149b1b9efe05b",
+      "bytes": 723368
+    },
+    {
+      "file": "OffiUtils.dll",
+      "sha256": "2b45e1e594855cefbc707f9f4517a09263b6cb17b1062012c56d1666750e3f22",
+      "bytes": 46080
+    },
+    {
+      "file": "OggVorbisEncoder.dll",
+      "sha256": "5c3c602bed65fa22915d4d56fe62c3ed584dfaf48fd2c31b49519ed211f77ff1",
+      "bytes": 895488
+    },
+    {
+      "file": "oodle-data-shared.dll",
+      "sha256": "cba19529d0a3b5ec9c630e95652af01e123ae29a34a8a5f7507f5bcf23d9e82b",
+      "bytes": 998400
+    },
+    {
+      "file": "Oodle.NET.dll",
+      "sha256": "0a1eb8b3fd2247f7b958e437585fafaf907514d6041e58ecb58068eaa2e76f7c",
+      "bytes": 9728
+    },
+    {
+      "file": "OodleSharp.dll",
+      "sha256": "c4885b763cfd4f5dc28ac663346f7efb0cc8d9229ca4c97ea3b76f87ea2d7091",
+      "bytes": 59904
+    },
+    {
+      "file": "presets/Iceland_verified_layers.json",
+      "sha256": "43b82f2cfd49570accb070c72189767f0359275a45faf66274005681dbfdcd4e",
+      "bytes": 2795
+    },
+    {
+      "file": "runtimes/osx/native/libSkiaSharp.dylib",
+      "sha256": "169e3c792cd1d364e518c9d693d74580659569dff8bafb4719c7576a556bccc3",
+      "bytes": 15116016
+    },
+    {
+      "file": "runtimes/win-arm64/native/libSkiaSharp.dll",
+      "sha256": "3e6a5a4ceb45d0e1003f070ae66e2b92e8cc6d5b8fd6e7fc890109f121bac46b",
+      "bytes": 7948344
+    },
+    {
+      "file": "runtimes/win-x64/native/libSkiaSharp.dll",
+      "sha256": "9a0d95e8caaa852c70d085af6a40a744242172ad9ea3fd6bc7599875a8a1dbcd",
+      "bytes": 9414216
+    },
+    {
+      "file": "runtimes/win-x86/native/libSkiaSharp.dll",
+      "sha256": "57500c7bb65f8db8d2ee40cc8f9736d950789912f7b1ec33944dad6c472c0d99",
+      "bytes": 7980600
+    },
+    {
+      "file": "Serilog.dll",
+      "sha256": "e6b551a75ff7fff20dd0024670d5c42dfb74afa16d54aa0201106dea400a9505",
+      "bytes": 162304
+    },
+    {
+      "file": "Serilog.Sinks.Console.dll",
+      "sha256": "dc88002ddd9f5fd0ffec9a6568ef89954671f60f2c9161593ee78932538c1e3e",
+      "bytes": 38400
+    },
+    {
+      "file": "SevenZip.dll",
+      "sha256": "976dcd9850b04cae4c4980dd47d58758535f00df6b5ab5cb4fb416eb2c93b788",
+      "bytes": 56832
+    },
+    {
+      "file": "SharpGLTF.Core.dll",
+      "sha256": "5126ace1397415e7e70ff5e385db46badf14221c9fa2d6afaf9c6d5041bf5870",
+      "bytes": 524800
+    },
+    {
+      "file": "SharpGLTF.Runtime.dll",
+      "sha256": "a57c195ae8fff50f5cc2dfb375ff4747adfb24ff04e310f38f3f0921a649eb45",
+      "bytes": 83456
+    },
+    {
+      "file": "SharpGLTF.Toolkit.dll",
+      "sha256": "a2bbf44eaac478a3d7bf751dd6e8d3895b997a2567c812d924711149832a86dc",
+      "bytes": 393728
+    },
+    {
+      "file": "SixLabors.ImageSharp.dll",
+      "sha256": "609a57965d0a7b5ccfb79d919ea7384e7ec86c03266b0390a19bd5f2104bc353",
+      "bytes": 2100736
+    },
+    {
+      "file": "SkiaSharp.dll",
+      "sha256": "17ee1284313749f73a5cf5f309318d831741a8d6d397c998c5fc6485843c28bb",
+      "bytes": 437808
+    },
+    {
+      "file": "SubstreamSharp.dll",
+      "sha256": "2f8928637fdf06b3ce7b6b72ee12a7cb29508c5e0ef4aba8125d046b21be0796",
+      "bytes": 8192
+    },
+    {
+      "file": "System.IO.Hashing.dll",
+      "sha256": "1285c15b4719f4e63993db2b5e8662be07645e829bb5fcc926831a2851a94a64",
+      "bytes": 56104
+    },
+    {
+      "file": "System.Numerics.Tensors.dll",
+      "sha256": "2a482195cd58352fc844b3f45628e7c4056187ebe2753e64ec53795abff3b9ea",
+      "bytes": 517928
+    },
+    {
+      "file": "UE4Config.dll",
+      "sha256": "79ef7a5b840cb0b337fe195746c08121dbc5e0c7862596ad44ad3d46137475ce",
+      "bytes": 40448
+    },
+    {
+      "file": "VGAudio.dll",
+      "sha256": "e32c17ed422f5e6419050fe4bb43f752ed11c8a7796c45f693865237d8a200a3",
+      "bytes": 258232
+    },
+    {
+      "file": "Zlib-ng.NET.dll",
+      "sha256": "f1746ed5806fe466af60938dfe7543ea524716816575fbb6a22d83cc0fc38673",
+      "bytes": 12800
+    },
+    {
+      "file": "zlib-ng2.dll",
+      "sha256": "454be2f3d10f804ace577198401431db5e95d0286b59589bc28a40085388e7c2",
+      "bytes": 153600
+    },
+    {
+      "file": "ZstdSharp.dll",
+      "sha256": "b285bb9f59928becb8e048bf2a75e872f6555f8773d7b72386a9f77f447f425c",
+      "bytes": 396800
+    }
+  ]
+}

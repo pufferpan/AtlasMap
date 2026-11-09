@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>scene-state</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ZstdSharp">
+      <HintPath>../../runtime/ZstdSharp.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="OffiUtils">
+      <HintPath>../../runtime/OffiUtils.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="CUE4Parse">
+      <HintPath>../../runtime/CUE4Parse.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="CUE4Parse-Conversion">
+      <HintPath>../../runtime/CUE4Parse-Conversion.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

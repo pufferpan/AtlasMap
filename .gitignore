@@ -1,0 +1,38 @@
+# Generated releases, exported maps and build caches
+/build/
+/dist/
+/dist-*/
+/work/
+*.zip
+*.zip.partial
+*.zip.sha256
+*.log
+**/__pycache__/
+*.py[cod]
+**/bin/
+**/obj/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.local.json
+.env
+.env.*
+
+# Owner signing material must never be committed or bundled.
+*.private.pem
+owner-signing-key.pem
+/activation-owner/
+*.key
+*.pfx
+*.p12
+assets/AESKey1.json
+
+# The pinned runtime/ toolchain and scripts/tools/scene-state/ are intentional
+# runtime dependencies and must remain tracked, including DLL/EXE files.

@@ -1,0 +1,135 @@
+from __future__ import annotations
+
+from enum import Enum
+from importlib import resources
+
+from .qt import QtGui
+
+
+class FluentIcon(str, Enum):
+    ACCESSIBILITY = "ic_fluent_accessibility_24_regular.svg"
+    ADD = "ic_fluent_add_24_regular.svg"
+    ADD_CIRCLE = "ic_fluent_add_circle_24_regular.svg"
+    ADD_SQUARE = "ic_fluent_add_square_24_regular.svg"
+    AIRPLANE = "ic_fluent_airplane_24_regular.svg"
+    ALERT = "ic_fluent_alert_24_regular.svg"
+    APPS = "ic_fluent_apps_24_regular.svg"
+    APPS_LIST = "ic_fluent_apps_list_24_regular.svg"
+    ARCHIVE = "ic_fluent_archive_24_regular.svg"
+    ARROW_CLOCKWISE = "ic_fluent_arrow_clockwise_24_regular.svg"
+    ARROW_DOWN = "ic_fluent_arrow_down_24_regular.svg"
+    ARROW_DOWN_LEFT = "ic_fluent_arrow_down_left_24_regular.svg"
+    ARROW_DOWNLOAD = "ic_fluent_arrow_download_24_regular.svg"
+    ARROW_EXIT = "ic_fluent_arrow_exit_24_regular.svg"
+    ARROW_EXPORT = "ic_fluent_arrow_export_24_regular.svg"
+    ARROW_IMPORT = "ic_fluent_arrow_import_24_regular.svg"
+    ARROW_LEFT = "ic_fluent_arrow_left_24_regular.svg"
+    ARROW_MAXIMIZE = "ic_fluent_arrow_maximize_24_regular.svg"
+    ARROW_MINIMIZE = "ic_fluent_arrow_minimize_24_regular.svg"
+    ARROW_REPEAT_ALL = "ic_fluent_arrow_repeat_all_24_regular.svg"
+    ARROW_RESET = "ic_fluent_arrow_reset_24_regular.svg"
+    ARROW_RIGHT = "ic_fluent_arrow_right_24_regular.svg"
+    ARROW_ROTATE_CLOCKWISE = "ic_fluent_arrow_rotate_clockwise_24_regular.svg"
+    ARROW_ROTATE_COUNTERCLOCKWISE = "ic_fluent_arrow_rotate_counterclockwise_24_regular.svg"
+    ARROW_SORT = "ic_fluent_arrow_sort_24_regular.svg"
+    ARROW_SWAP = "ic_fluent_arrow_swap_24_regular.svg"
+    ARROW_SYNC = "ic_fluent_arrow_sync_24_regular.svg"
+    ARROW_TRENDING = "ic_fluent_arrow_trending_24_regular.svg"
+    ARROW_UP = "ic_fluent_arrow_up_24_regular.svg"
+    ARROW_UP_RIGHT = "ic_fluent_arrow_up_right_24_regular.svg"
+    ARROW_UPLOAD = "ic_fluent_arrow_upload_24_regular.svg"
+    ATTACH = "ic_fluent_attach_24_regular.svg"
+    BACKPACK = "ic_fluent_backpack_24_regular.svg"
+    BOOK = "ic_fluent_book_24_regular.svg"
+    BOOKMARK = "ic_fluent_bookmark_24_regular.svg"
+    BOT = "ic_fluent_bot_24_regular.svg"
+    BRIEFCASE = "ic_fluent_briefcase_24_regular.svg"
+    BUG = "ic_fluent_bug_24_regular.svg"
+    BUILDING = "ic_fluent_building_24_regular.svg"
+    BUILDING_BANK = "ic_fluent_building_bank_24_regular.svg"
+    CALENDAR_LTR = "ic_fluent_calendar_ltr_24_regular.svg"
+    CALL = "ic_fluent_call_24_regular.svg"
+    CAMERA = "ic_fluent_camera_24_regular.svg"
+    CART = "ic_fluent_cart_24_regular.svg"
+    CHAT = "ic_fluent_chat_24_regular.svg"
+    CHAT_MULTIPLE = "ic_fluent_chat_multiple_24_regular.svg"
+    CHECKBOX_CHECKED = "ic_fluent_checkbox_checked_24_regular.svg"
+    CHECKBOX_UNCHECKED = "ic_fluent_checkbox_unchecked_24_regular.svg"
+    CHECKMARK = "ic_fluent_checkmark_24_regular.svg"
+    CHECKMARK_CIRCLE = "ic_fluent_checkmark_circle_24_regular.svg"
+    CHECKMARK_SQUARE = "ic_fluent_checkmark_square_24_regular.svg"
+    CHEVRON_DOWN = "ic_fluent_chevron_down_24_regular.svg"
+    CHEVRON_LEFT = "ic_fluent_chevron_left_24_regular.svg"
+    CHEVRON_RIGHT = "ic_fluent_chevron_right_24_regular.svg"
+    CHEVRON_UP = "ic_fluent_chevron_up_24_regular.svg"
+    CLIPBOARD = "ic_fluent_clipboard_24_regular.svg"
+    CLIPBOARD_TEXT_LTR = "ic_fluent_clipboard_text_ltr_24_regular.svg"
+    CLOCK = "ic_fluent_clock_24_regular.svg"
+    CLOUD = "ic_fluent_cloud_24_regular.svg"
+    CODE = "ic_fluent_code_24_regular.svg"
+    COLOR = "ic_fluent_color_24_regular.svg"
+    COMMENT = "ic_fluent_comment_24_regular.svg"
+    COMMENT_MULTIPLE = "ic_fluent_comment_multiple_24_regular.svg"
+    CONTACT_CARD = "ic_fluent_contact_card_24_regular.svg"
+    COPY = "ic_fluent_copy_24_regular.svg"
+    CUT = "ic_fluent_cut_24_regular.svg"
+    DELETE = "ic_fluent_delete_24_regular.svg"
+    DESKTOP = "ic_fluent_desktop_24_regular.svg"
+    DISMISS = "ic_fluent_dismiss_24_regular.svg"
+    DISMISS_CIRCLE = "ic_fluent_dismiss_circle_24_regular.svg"
+    DOCUMENT = "ic_fluent_document_24_regular.svg"
+    DOCUMENT_ADD = "ic_fluent_document_add_24_regular.svg"
+    DOCUMENT_COPY = "ic_fluent_document_copy_24_regular.svg"
+    DOCUMENT_EDIT = "ic_fluent_document_edit_24_regular.svg"
+    DOCUMENT_SAVE = "ic_fluent_document_save_24_regular.svg"
+    DOCUMENT_SEARCH = "ic_fluent_document_search_24_regular.svg"
+    DOCUMENT_TEXT = "ic_fluent_document_text_24_regular.svg"
+    EDIT = "ic_fluent_edit_24_regular.svg"
+    EYEDROPPER = "ic_fluent_eyedropper_24_regular.svg"
+    EYE = "ic_fluent_eye_24_regular.svg"
+    EYE_OFF = "ic_fluent_eye_off_24_regular.svg"
+    FILTER = "ic_fluent_filter_24_regular.svg"
+    FILTER_DISMISS = "ic_fluent_filter_dismiss_24_regular.svg"
+    FINGERPRINT = "ic_fluent_fingerprint_24_regular.svg"
+    FLAG = "ic_fluent_flag_24_regular.svg"
+    FOLDER = "ic_fluent_folder_24_regular.svg"
+    FOLDER_OPEN = "ic_fluent_folder_open_24_regular.svg"
+    GAMES = "ic_fluent_games_24_regular.svg"
+    GLOBE = "ic_fluent_globe_24_regular.svg"
+    GRID = "ic_fluent_grid_24_regular.svg"
+    HEART = "ic_fluent_heart_24_regular.svg"
+    HISTORY = "ic_fluent_history_24_regular.svg"
+    HOME = "ic_fluent_home_24_regular.svg"
+    ICONS = "ic_fluent_icons_24_regular.svg"
+    IMAGE = "ic_fluent_image_24_regular.svg"
+    INFO = "ic_fluent_info_24_regular.svg"
+    KEY = "ic_fluent_key_24_regular.svg"
+    LAPTOP = "ic_fluent_laptop_24_regular.svg"
+    LAYOUT_ROW_THREE = "ic_fluent_layout_row_three_24_regular.svg"
+    MONEY = "ic_fluent_money_24_regular.svg"
+    MUSIC_NOTE_2 = "ic_fluent_music_note_2_24_regular.svg"
+    NAVIGATION = "ic_fluent_navigation_24_regular.svg"
+    OPEN = "ic_fluent_open_24_regular.svg"
+    SETTINGS = "ic_fluent_settings_24_regular.svg"
+    TABLE = "ic_fluent_table_24_regular.svg"
+    TEXT_FONT = "ic_fluent_text_font_24_regular.svg"
+    TOOLBOX = "ic_fluent_toolbox_24_regular.svg"
+
+
+def fluent_icon(icon: FluentIcon | str) -> QtGui.QIcon:
+    """Load a bundled MIT-licensed Microsoft Fluent System Icon."""
+
+    name = icon.value if isinstance(icon, FluentIcon) else icon
+    icon_path = resources.files("fluentpy.assets.icons").joinpath(name)
+    return QtGui.QIcon(str(icon_path))
+
+
+def fluent_icon_name(icon: FluentIcon | str) -> str:
+    """Return a readable Fluent icon name from an enum value or SVG file name."""
+
+    name = icon.value if isinstance(icon, FluentIcon) else icon
+    if name.startswith("ic_fluent_"):
+        name = name[len("ic_fluent_") :]
+    if name.endswith("_24_regular.svg"):
+        name = name[: -len("_24_regular.svg")]
+    return " ".join(part.capitalize() for part in name.split("_"))
