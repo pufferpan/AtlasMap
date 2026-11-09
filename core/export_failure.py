@@ -35,6 +35,11 @@ class ExportFailure:
 
 def classify(text):
     lower=text.lower()
+    if ('aes key file not found' in lower or 'aeskey1.json' in lower or 'aes 密钥' in text
+            or '密钥文件不存在' in text):
+        return (99,'key','缺少 AES 密钥文件','导出器要解开游戏 pak，必须有一份 AESKey1.json，当前路径不存在。',
+                '在「设置 → 密钥 JSON」里选你自己的 AESKey1.json；或把它放到程序目录的 '
+                'assets\\AESKey1.json（单文件版放 exe 旁边也行），程序下次会自动找到。')
     if any(s in lower for s in ('memoryerror','out of memory','outofmemoryexception','ran out of memory',
             'malloc returns null','bad_alloc','bad allocation','页面文件太小','内存不足','内存资源不足',
             'not enough memory resources','insufficient system resources','map_memory_full',

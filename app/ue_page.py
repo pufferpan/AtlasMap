@@ -886,6 +886,16 @@ class UePage(QWidget):
             F.message(self, '首次使用需要完成环境配置', '还缺少：' + '、'.join(missing) + '。\n已展开配置项，请选择对应程序；配置一次后即可切回简易模式。')
             self.shell.status("还差：" + "、".join(missing))
             return
+        if not exporter.resolve_keyfile():
+            self.advanced_switch.setChecked(True)
+            F.message(self, '还没有 AES 密钥文件',
+                      '导出器要解开游戏的 pak，必须有一份 AESKey1.json。\n\n'
+                      '两种放法任选一种：\n'
+                      '1) 在「设置 → 密钥 JSON」里选它；\n'
+                      '2) 把它放到程序目录的 assets\\AESKey1.json（单文件版放 exe 旁边也行）。\n\n'
+                      '放一次就记住了，之后不用再选。')
+            self.shell.status('缺少 AES 密钥文件')
+            return
         root = p["root"]
         if not blender_target and any(ord(ch) > 127 for ch in root + p["project"]):
             self.shell.status("导出目录/工程路径里有中文，先换成纯 ASCII 路径")

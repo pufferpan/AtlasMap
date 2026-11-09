@@ -160,6 +160,35 @@ def game_resource_root(paks: str) -> str:
     return str(paks)
 
 
+def keyfile_candidates() -> list:
+    """AES 密钥文件可能放的位置（按优先级）：程序目录、程序目录/assets、配置目录。"""
+    roots = []
+    meipass = _meipass()
+    if meipass:
+        roots.append(meipass)
+    if getattr(sys, "frozen", False):
+        roots.append(os.path.dirname(os.path.abspath(sys.executable)))
+    roots.append(_src_root())
+    roots.append(app_dir())
+    out = []
+    for root in roots:
+        for rel in ("AESKey1.json", os.path.join("assets", "AESKey1.json")):
+            path = os.path.join(root, rel)
+            if os.path.isfile(path) and path not in out:
+                out.append(path)
+    return out
+
+
+def resolve_keyfile(settings: Optional[Dict[str, object]] = None) -> str:
+    """返回真正可用的密钥文件路径；设置里的路径不存在时自动找随包/程序目录里的。"""
+    s = settings or load_settings()
+    chosen = str(s.get("keyfile") or "").strip()
+    if chosen and os.path.isfile(chosen):
+        return chosen
+    hits = keyfile_candidates()
+    return hits[0] if hits else ""
+
+
 def write_exporter_config(settings: Optional[Dict[str, object]] = None, path: Optional[str] = None) -> str:
     """把界面里的设置写成导出器认识的 json，返回路径。"""
     s = settings or load_settings()
@@ -168,7 +197,7 @@ def write_exporter_config(settings: Optional[Dict[str, object]] = None, path: Op
         "Recursive": True,
         "Game": s.get("game") or "GAME_DeltaForce",
         "MeshGame": "",
-        "KeyFile": (s.get("keyfile") or "").replace("\\", "/"),
+        "KeyFile": resolve_keyfile(s).replace("\\", "/"),
         "KeyUrl": "",
     }
     path = path or exporter_config_path()
