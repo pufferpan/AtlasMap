@@ -17,7 +17,7 @@ sys.path.insert(0, str(BASE))
 from app.version import stamp
 
 SKIP = {'__pycache__', 'bin', 'obj', '.git', '.venv', '.pytest_cache', 'node_modules', '.cache'}
-PRIVATE_NAMES = {'license.json', 'activation.json', 'settings.json', 'owner-signing-key.pem'}
+PRIVATE_NAMES = {'license.json', 'activation.json', 'settings.json'}
 
 
 def _rel(path):
