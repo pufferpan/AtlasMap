@@ -65,12 +65,6 @@ def run(argv: Optional[list] = None) -> int:
     app.setApplicationDisplayName("AtlasMap · 地图导出器")
     _apply_theme(app)
 
-    # Enforce activation before constructing the main window, including
-    # no-splash and packaged self-check launches.
-    from app.activation import require_activation
-    if not require_activation():
-        return 0
-
     if len(argv)==3 and argv[1]=='--verify-failure-ui':
         from tools.verify_failure_ui import run as verify_failure_ui
         return verify_failure_ui(argv[2])
@@ -439,20 +433,6 @@ def run(argv: Optional[list] = None) -> int:
             code,text=exporter.run_blocking([helper,'--check-runtime',os.path.dirname(exporter.find_exe()),
                 exporter.exporter_config_path(),runtime_check,runtime_check],timeout=60)
             result['state_helper_codec']=code==0 and 'ZstdSharp 0.8.8.0 ready' in text
-        from core import activation as licensing
-        from app.activation import activation_dialog
-        activation_config=licensing.public_config();activation_machine=licensing.machine_code()
-        result['activation_verified']=licensing.saved_license(activation_machine,licensing.unb64(activation_config['public_key']))[0]
-        activation_ui=activation_dialog(activation_machine,activation_config)
-        activation_ui._prepare_geometry();activation_ui.show();app.processEvents()
-        result['activation_native']=(type(activation_ui) is fluent_widgets.FramelessDialog
-            and type(activation_ui.machine_edit) is fluent_widgets.LineEdit
-            and type(activation_ui.code_edit) is fluent_widgets.TextEdit)
-        activation_ui.code_edit.setPlainText('invalid activation code');activation_ui.yes_button.click()
-        result['activation_invalid_blocked']=activation_ui.result()==0 and bool(activation_ui.notice.detail())
-        activation_ui.code_edit.clear();F.set_warning(activation_ui.notice,'');app.processEvents()
-        activation_ui.grab().save(os.path.splitext(check_output)[0]+'-activation.png')
-        activation_ui.close();activation_ui.deleteLater()
         win.set_parallel_theme(win.ue_page.chk_parallel.isChecked())
         splash.close()
         result['complete'] = (result['project_file_tools'] and result['project_manager_native'] and result['simple_mode_toggle'] and result['runtime_scripts_complete'] and result['runtime_exporter_valid'] and result['runtime_exporter_selected'] and result['fluent_native_controls'] and result['full_log_untruncated'] and result['full_log_all_workers'] and result['full_log_worker_button']
@@ -474,8 +454,7 @@ def run(argv: Optional[list] = None) -> int:
                               and result['performance_effect_visible']
                               and all(result.get(k) for k in ('preview_nonmodal','preview_native_controls','preview_rotation',
                                   'preview_zoom','preview_chunk_filter','blender_export_native',
-                                  'wegame_maps_native','state_helper_codec','activation_verified',
-                                  'activation_native','activation_invalid_blocked')))
+                                  'wegame_maps_native','state_helper_codec')))
         with open(check_output, "w", encoding="utf-8") as fh:
             json.dump(result, fh, ensure_ascii=False, indent=2)
         win.close()

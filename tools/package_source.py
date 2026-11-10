@@ -110,7 +110,7 @@ def main():
                     'exporter-source/source/dfmap/Program.cs', 'exporter-source/source/dfmap/dfmap.csproj',
                     'runtime/dfmap.dll', 'build-source.ps1', 'app/export_quality.py',
                     'core/export_quality.py', 'core/export_failure.py', 'app/failure_notice.py',
-                    'scripts/official/map_json.py', 'assets/activation-public.json')
+                    'scripts/official/map_json.py')
         for name in required:
             assert root+name in archive.namelist(), name
     partial.replace(output)

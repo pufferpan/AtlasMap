@@ -33,7 +33,7 @@ datas = []
 hiddenimports = []
 
 # ---- 本体资源 --------------------------------------------------------------
-for name in ("maplogo.png", "unreal-engine.svg", "wizard_bg.png", "wizard_base.png", "activation-public.json",
+for name in ("maplogo.png", "unreal-engine.svg", "wizard_bg.png", "wizard_base.png",
              "tutorial_maps.png", "tutorial_ue.png", "tutorial_performance.png", "tutorial_progress.png",
              "wizard_rows.json", "wizard_row1.png", "wizard_row2.png", "wizard_row3.png"):
     path = os.path.join(ROOT, "assets", name)
