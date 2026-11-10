@@ -1,24 +1,22 @@
 # AtlasMap
+# 禁止使用该项目用于非法用途包括但不限于导出的资产
 
-地图导出器，当前源码版本 `1.0+2026-11-05.export-quality`。
+地图导出器，当前源码版本 `1.0+2026-11-05.export-quality`
 
-新增五档导出质量与预计大小，支持 UE、Blender 和性能模式，简易模式也可直接使用。估算范围和使用方式见 [导出质量说明](docs/export-quality.md)。
+新增五档导出质量与预计大小，支持 UE、Blender 和性能模式，简易模式也可直接使用。估算范围和使用方式见 [导出质量说明](docs/export-quality.md)
 
-不再需要激活码：程序启动即用，没有机器码、没有有效期、没有联网校验；旧版的激活码与签发网页已从代码中移除。
+支持一键导出 Blender 完整工程和导出过程中可旋转、缩放的分块 3D 预览。本版修复 WeGame 更新资源漏读导致的Brakkesh、Collapse缺失，以及 MA1 分块分析缺少 ZstdSharp 依赖的问题。使用方式和验证范围见 [更新说明](docs/blender-preview-wegame-fix.md)
 
-支持一键导出 Blender 完整工程和导出过程中可旋转、缩放的分块 3D 预览。本版修复 WeGame 更新资源漏读导致的Brakkesh、Collapse缺失，以及 MA1 分块分析缺少 ZstdSharp 依赖的问题。使用方式和验证范围见 [更新说明](docs/blender-preview-wegame-fix.md)。
+本版恢复指定天空 Cubemap、源曝光范围/曲线/测光图，修复已关闭的雾被启用，并按要求默认移除爆破模式开局空气墙。详见 [更新说明](docs/更新说明_20261103_天空光与空气墙.md)。虚幻引擎已适配 5.4 普通版
 
-本版恢复指定天空 Cubemap、源曝光范围/曲线/测光图，修复已关闭的雾被启用，并按要求默认移除爆破模式开局空气墙。详见 [更新说明](docs/更新说明_20261103_天空光与空气墙.md)。虚幻引擎 **5.4 特殊构建版，已适配 5.4 普通版**。
+包含桌面界面、首次向导和渐变开屏，以及地图导出、源渲染状态保存、Blender 转换、UE 导入与预览流程
 
-包含桌面界面、首次向导和渐变开屏，以及地图导出、源渲染状态保存、Blender 转换、UE 导入与预览流程。
+本版合并完整任务日志、FluentPy 控件、首次使用图解教程、HDR 反射与材质源数据修复，并修复 Windows 长路径烘焙资源合并和超大天空边界的精度误判。验证范围见 [长路径修复说明](docs/NOTES-long-path-fix.md)
 
-本版合并完整任务日志、FluentPy 控件、首次使用图解教程、HDR 反射与材质源数据修复，并修复 Windows 长路径烘焙资源合并和超大天空边界的精度误判。验证范围见 [长路径修复说明](docs/NOTES-long-path-fix.md)。
-
-本次同时保留原生 FluentPy 控件、最新网格拓扑修复，并修复 Retrowar 批量创建对象时的 NullRHI Hit Proxy 数组溢出，见 [无渲染导入修复](docs/nullrhi-import-fix.md)。
-
+本次同时保留原生 FluentPy 控件、最新网格拓扑修复，并修复 Retrowar 批量创建对象时的 NullRHI Hit Proxy 数组溢出，见 [无渲染导入修复](docs/nullrhi-import-fix.md)
 ## 开发与构建
 
-Windows x64，Python 3.12，.NET 10；编译辅助程序需要 .NET 10 SDK。
+Windows x64，Python 3.12，.NET 10；编译辅助程序需要 .NET 10 SDK
 
 ```powershell
 python -m venv .venv
