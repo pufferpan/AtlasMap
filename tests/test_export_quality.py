@@ -14,6 +14,50 @@ from app.export_quality import QualityPanel
 
 
 class QualityTests(unittest.TestCase):
+    def test_history_records_real_bytes_and_beats_guessing(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)/'Map';root.mkdir();(root/'chunks').mkdir()
+            (root/'chunks/_a.bin').write_bytes(b'x'*1000)
+            (root/'chunks/_a.blend').write_bytes(b'y'*300)
+            textures=root/'textures';textures.mkdir()
+            (textures/'T.png').write_bytes(b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR'+struct.pack('>II',1024,1024)+b'\x00'*4000)
+            project=Path(folder)/'UE/Map.uproject';project.parent.mkdir()
+            (project.parent/'Content').mkdir();(project.parent/'Content/map.umap').write_bytes(b'z'*700)
+            with patch.object(Q,'_history_path',return_value=Path(folder)/'history.json'):
+                self.assertTrue(Q.record_export('Map',root,project=str(project)))
+                history=Q.evidence('MAP')
+                self.assertEqual(history['kind'],'history')
+                self.assertGreater(history['source_bytes'],4400)
+                self.assertEqual(history['ue_bytes'],700)
+                exact=Q.forecast(history,'standard','raw',1)
+                self.assertFalse(exact['approximate'])
+                self.assertLessEqual(exact['low'],history['source_bytes'])
+                self.assertGreaterEqual(exact['high'],history['source_bytes'])
+                ue=Q.forecast(history,'standard','ue',1)
+                self.assertLessEqual(ue['low'],700);self.assertGreaterEqual(ue['high'],700)
+                # 没有 project 时退回按源体积比例，不返回 0
+                self.assertTrue(Q.record_export('Map',root))
+                fallback=Q.forecast(Q.evidence('map'),'standard','ue',1)
+                self.assertGreater(fallback['low'],0)
+                coarse=Q.forecast(Q.evidence('map'),'draft','ue',1)
+                self.assertLessEqual(coarse['high'],fallback['high'])
+
+    def test_history_is_zero_when_the_folder_is_gone(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with patch.object(Q,'_history_path',return_value=Path(folder)/'history.json'):
+                self.assertFalse(Q.record_export('Map',Path(folder)/'missing'))
+                self.assertIsNone(Q.evidence('Map',settings=dict(paks='P',game='GAME_DeltaForce')))
+
+    def test_source_forecast_brackets_measured_exports(self):
+        # SafeHouse：贴图 0.95GB、机匣几何 96MB，实测源 2.10GB / UE 0.99GB
+        data=dict(kind='source',geometry=96*Q.MB,instances=2771,texture_bytes=1020*Q.MB,
+                  reference=1024,images=1993,note='')
+        raw=Q.forecast(data,'standard','raw',2);ue=Q.forecast(data,'standard','ue',2)
+        self.assertLess(raw['low'],2.10*Q.GB);self.assertGreater(raw['high'],2.10*Q.GB)
+        self.assertLess(ue['low'],0.99*Q.GB);self.assertGreater(ue['high'],0.99*Q.GB)
+        # 质量档位越小，区间上界不会变大
+        self.assertLessEqual(Q.forecast(data,'draft','raw',2)['high'],raw['high'])
+
     def parameters(self,folder,**extra):
         return dict(root=folder+'/raw',transfer=folder+'/work',map='Test',blender='Blender.exe',scripts=folder+'/scripts',
                     engine='UE.exe',cmd='UE-Cmd.exe',project=folder+'/Test.uproject',dest='/Game/Test',

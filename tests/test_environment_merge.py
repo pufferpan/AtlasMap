@@ -53,11 +53,29 @@ class EnvironmentMergeTests(unittest.TestCase):
         with self.assertRaises((ValueError,FileNotFoundError)):self.merge()
 
     def test_rendering_metadata_conflicts_are_not_ignored(self):
-        for field,value in [('eligible',True),('kind','latlong')]:
-            with self.subTest(field=field):
-                changed=copy.deepcopy(self.row);changed[field]=value
-                self.fixture(rows=[self.row,changed])
-                with self.assertRaisesRegex(ValueError,'环境资源在分块间不一致'):self.merge()
+        with self.subTest(field='kind'):
+            changed=copy.deepcopy(self.row);changed['kind']='latlong'
+            self.fixture(rows=[self.row,changed])
+            with self.assertRaisesRegex(ValueError,'环境资源在分块间不一致'):self.merge()
+
+    def test_eligibility_is_merged_not_rejected(self):
+        # One shard sees the cube under a Sky actor, another under a capture;
+        # the pixels are shared, so the export must keep going and stay eligible.
+        sky=dict(self.row,eligible=True,selection_basis='sky Material_Actor')
+        self.fixture(rows=[self.row,sky])
+        document=self.merge()
+        row=document['skies'][0]
+        self.assertTrue(row['eligible'])
+        self.assertEqual(row['selection_bases'],['capture Actor_A','sky Material_Actor'])
+
+    def test_eligibility_merge_is_order_independent(self):
+        sky=dict(self.row,eligible=True,selection_basis='sky Material_Actor')
+        self.fixture(rows=[self.row,sky])
+        forward=self.merge()['skies'][0]
+        backward=self.merge(list(reversed(self.roots)))['skies'][0]
+        self.assertTrue(forward['eligible'])
+        self.assertEqual(forward['eligible'],backward['eligible'])
+        self.assertEqual(forward['selection_bases'],backward['selection_bases'])
 
     def test_reflection_cubes_still_validate_duplicate_bytes(self):
         row=dict(guid='a'*32,source='assets/Test.uexp',texture='environment/shared.dds',brightness=1)

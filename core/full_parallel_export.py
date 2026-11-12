@@ -54,7 +54,13 @@ def link_copy(source, target, pipeline=None):
 def _environment_content(row):
     # A shared cube may be referenced by different actors in each shard.
     # These fields describe provenance, not its pixels or rendering settings.
-    return {k:v for k,v in row.items() if k not in ('selection_basis','selection_bases')}
+    # ``eligible`` is derived from the same per-shard actor label, so two shards
+    # legitimately disagree when one sees the cube under a Sky actor and the
+    # other under a ReflectionCapture; merge it with a logical OR instead of
+    # aborting the whole export (a large map can reference one HDRI from dozens
+    # of actors spread over many chunks).
+    return {k:v for k,v in row.items()
+            if k not in ('selection_basis','selection_bases','eligible')}
 
 
 def _merge_environment_provenance(first, second):
@@ -126,7 +132,12 @@ def merge_source_states(roots, destination, map_root, pipeline=None):
                 # provenance; matching JSON alone cannot prove integrity.
                 if target.exists() and target.read_bytes()!=source.read_bytes():raise ValueError('环境贴图冲突：'+relative)
                 if not target.exists():link_copy(source,target,pipeline)
-                if key in combined:_merge_environment_provenance(combined[key],row)
+                if key in combined:
+                    # One shard may have seen this resource from a Sky actor and
+                    # another from a reflection capture; either reference is
+                    # enough to keep it eligible, the texture bytes are shared.
+                    if row.get('eligible'):combined[key]['eligible']=True
+                    _merge_environment_provenance(combined[key],row)
                 else:
                     combined[key]=dict(row)
                     _merge_environment_provenance(combined[key],{})

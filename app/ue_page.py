@@ -948,6 +948,13 @@ class UePage(QWidget):
                     Catalogue().register(project, p['map'], root, p['dest'])
                 except (OSError, ValueError) as error:
                     self.shell.status('导出成功，但工程记录保存失败：' + str(error))
+                try:
+                    # 记下这次实际有多大，下次同一张图的预估就是实测值
+                    from core import export_quality as _Q
+                    _Q.record_export(p['map'], root, project='' if blender_target else project,
+                                     max_tex=int(p.get('max_tex',0) or 0))
+                except (OSError, ValueError, TypeError):
+                    pass
             try:
                 # 「打开」直接指到刚生成的 .uproject（在资源管理器里选中它），
                 # 找不到就退到工程目录
