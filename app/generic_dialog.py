@@ -70,6 +70,11 @@ class GenericDialog(W.FramelessDialog):
         row.addWidget(self.btn_probe)
         root.addLayout(row)
 
+        root.addWidget(self._label("映射文件（.usmap，可选）", 13))
+        self.ed_mapping = F.LineEdit()
+        self.ed_mapping.setPlaceholderText("UE5 游戏多半需要；留空则在包目录/上一级自动找 *.usmap")
+        root.addLayout(self._with_button(self.ed_mapping, "浏览…", self._browse_mapping))
+
         root.addWidget(self._label("地图（.umap）", 13))
         self.cb_map = F.EditableComboBox()
         self.cb_map.setMinimumWidth(_px(320))
@@ -153,6 +158,11 @@ class GenericDialog(W.FramelessDialog):
             self.ed_root.setText(folder)
             self._detect_paks()
 
+    def _browse_mapping(self) -> None:
+        name, _ = QFileDialog.getOpenFileName(self, "选择 .usmap 映射文件", "", "Usmap (*.usmap);;所有文件 (*)")
+        if name:
+            self.ed_mapping.setText(name)
+
     def _browse_out(self) -> None:
         folder = QFileDialog.getExistingDirectory(self, "选择输出目录", self.ed_out.text() or "")
         if folder:
@@ -179,7 +189,9 @@ class GenericDialog(W.FramelessDialog):
     def _write_config(self, keyfile: str = "") -> str:
         return generic.write_config(self._config_path(), self._paks,
                                     self.cb_profile.currentText() or "GAME_UE5_3",
-                                    keyfile=keyfile, oodle=self._oodle)
+                                    keyfile=keyfile, oodle=self._oodle,
+                                    mappings=(self.ed_mapping.text().strip()
+                                              if hasattr(self, "ed_mapping") else ""))
 
     def _probe_clicked(self) -> None:
         paks = getattr(self, "_paks", None) or self._detect_paks()

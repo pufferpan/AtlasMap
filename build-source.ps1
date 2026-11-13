@@ -13,7 +13,7 @@ if (-not $ToolSource) {
 $ToolSource = (Resolve-Path -LiteralPath $ToolSource).Path
 $expected = @{
     'map-export.exe' = '32cfc2d98630eba7c8513027d8b5a72cc30da86c7fffb0283f45a6e4f18b548c'
-    'dfmap.dll' = '23642525d210d158cb6a57ffd6e3258e6e5fbbb6d4cb2dbfd91c6f3376b3f103'
+    'dfmap.dll' = '5487055ac32c5d059f5339b53e7cba37fdc8c42564cf822ae181390e7a6bdc24'
 }
 foreach ($entry in $expected.GetEnumerator()) {
     $actual = (Get-FileHash -LiteralPath (Join-Path $ToolSource $entry.Key) -Algorithm SHA256).Hash

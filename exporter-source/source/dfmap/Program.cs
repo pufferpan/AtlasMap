@@ -181,6 +181,7 @@ public static class Program
         {
             game = _cfg.Game,
             paksDirectory = _cfg.PaksDirectory,
+            mappings = Mount.ResolveMappings(_cfg),
             mounted = provider.MountedVfs.Count,
             files = provider.Files.Count,
             archives,

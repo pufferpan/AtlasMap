@@ -65,13 +65,15 @@ def _walk_paks(folder: Path, depth: int, max_depth: int, found: List[str]) -> No
 
 
 def write_config(path: str, game_root: str, profile: str = "GAME_UE5_3", *,
-                 keyfile: str = "", oodle: str = "", recursive: bool = True) -> str:
+                 keyfile: str = "", oodle: str = "", recursive: bool = True,
+                 mappings: str = "") -> str:
     """给导出器写一份最小配置；没有密钥文件也允许（未加密的包照样能挂）。"""
     data = {
         "PaksDirectory": str(game_root).replace("\\", "/"),
         "Recursive": bool(recursive),
         "KeyFile": str(keyfile or "").replace("\\", "/"),
         "OodlePath": str(oodle or "").replace("\\", "/"),
+        "MappingsFile": str(mappings or "").replace("\\", "/"),
         "Game": profile or "GAME_UE5_3",
     }
     target = Path(path)

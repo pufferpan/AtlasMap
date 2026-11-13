@@ -51,6 +51,7 @@ public static class ConfigService
         config.PaksDirectory = Resolve(config.PaksDirectory);
         config.KeyFile = Resolve(config.KeyFile ?? GameConfig.DefaultKeyFile);
         config.OodlePath = Resolve(config.OodlePath);
+        config.MappingsFile = Resolve(config.MappingsFile);
         config.Game = NormalizePath(config.Game);
         config.MeshGame = NormalizePath(config.MeshGame);
         ParseGameProfile(config.Game);

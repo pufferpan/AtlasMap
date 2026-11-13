@@ -59,6 +59,12 @@ public sealed class GameConfig
     public string OodlePath { get; set; }
 
     /// <summary>
+    /// 可选：.usmap 映射文件。UE5 的 cooked 包是 unversioned 的，没有映射就读不出
+    /// actor 属性（报 MappingException / 0 实例）。留空时自动在包目录及上一级找 *.usmap。
+    /// </summary>
+    public string MappingsFile { get; set; }
+
+    /// <summary>
     /// Which CUE4Parse game profile to use. GAME_DeltaForce is REQUIRED: with GAME_UE4_27
     /// zero archives mount, because Game's pak footer drops the EncryptionKeyGuid /
     /// bEncryptedIndex fields and only the dedicated profile parses it.
@@ -114,6 +120,28 @@ public static class Mount
         var provider = new DefaultFileProvider(
             cfg.PaksDirectory, search, versions, StringComparer.OrdinalIgnoreCase);
 
+        // UE5 的 cooked 包是 unversioned 的，属性名要映射文件（.usmap）才能反序列化。
+        // DF 有内置类型表，别的游戏没有映射就会整关卡读不出来（MappingException）。
+        var mappings = ResolveMappings(cfg);
+        if (mappings != null)
+        {
+            try
+            {
+                provider.MappingsContainer = new CUE4Parse.MappingsProvider.Usmap.FileUsmapTypeMappingsProvider(
+                    mappings, StringComparer.OrdinalIgnoreCase);
+                if (verbose) Console.Error.WriteLine($"[atlas] mappings: {mappings}");
+            }
+            catch (Exception exc)
+            {
+                Console.Error.WriteLine($"[atlas] mappings failed to load '{mappings}': {exc.Message}");
+            }
+        }
+        else if (verbose)
+        {
+            Console.Error.WriteLine("[atlas] no .usmap mappings found; UE5 packages with unversioned "
+                                    + "properties will fail to deserialize");
+        }
+
         var sw = Stopwatch.StartNew();
         provider.Initialize();
         if (verbose) Console.Error.WriteLine($"[atlas] scanned '{cfg.PaksDirectory}' ({search}) in {sw.ElapsedMilliseconds} ms");
@@ -136,5 +164,41 @@ public static class Mount
                                     $"(mount and levels stay on {game}); see MeshGame docs");
 
         return provider;
+    }
+
+    /// <summary>
+    /// 找映射文件：配置里指定的优先；否则在包目录自身、上一级、以及常见
+    /// Mappings / usmap 子目录里找一个 *.usmap。
+    /// </summary>
+    public static string ResolveMappings(GameConfig cfg)
+    {
+        if (!string.IsNullOrWhiteSpace(cfg.MappingsFile))
+            return File.Exists(cfg.MappingsFile) ? Path.GetFullPath(cfg.MappingsFile) : null;
+
+        var roots = new List<string>();
+        var paks = Path.GetFullPath(cfg.PaksDirectory);
+        roots.Add(paks);
+        var parent = Directory.GetParent(paks);
+        if (parent != null) roots.Add(parent.FullName);
+        foreach (var root in roots.ToList())
+        {
+            roots.Add(Path.Combine(root, "Mappings"));
+            roots.Add(Path.Combine(root, "usmap"));
+        }
+
+        foreach (var root in roots)
+        {
+            if (!Directory.Exists(root)) continue;
+            try
+            {
+                var hit = Directory.EnumerateFiles(root, "*.usmap", SearchOption.TopDirectoryOnly)
+                    .OrderByDescending(f => new FileInfo(f).Length)
+                    .FirstOrDefault();
+                if (hit != null) return Path.GetFullPath(hit);
+            }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
+        return null;
     }
 }

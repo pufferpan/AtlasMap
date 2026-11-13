@@ -101,7 +101,7 @@ if ONEFILE:
     reference = Path(os.environ.get('ATLASMAP_TOOL_SOURCE') or os.path.join(ROOT, 'runtime'))
     for name, expected in (
         ('map-export.exe', '32cfc2d98630eba7c8513027d8b5a72cc30da86c7fffb0283f45a6e4f18b548c'),
-        ('dfmap.dll', '23642525d210d158cb6a57ffd6e3258e6e5fbbb6d4cb2dbfd91c6f3376b3f103')):
+        ('dfmap.dll', '5487055ac32c5d059f5339b53e7cba37fdc8c42564cf822ae181390e7a6bdc24')):
         if hashlib.sha256((reference/name).read_bytes()).hexdigest() != expected:
             raise RuntimeError('Reference exporter hash mismatch: ' + name)
     manifest = []
@@ -205,7 +205,7 @@ if not ONEFILE:
         raise RuntimeError('Missing reference exporter: '+str(_reference))
     for _name,_expected in (
         ('map-export.exe','32cfc2d98630eba7c8513027d8b5a72cc30da86c7fffb0283f45a6e4f18b548c'),
-        ('dfmap.dll','23642525d210d158cb6a57ffd6e3258e6e5fbbb6d4cb2dbfd91c6f3376b3f103')):
+        ('dfmap.dll','5487055ac32c5d059f5339b53e7cba37fdc8c42564cf822ae181390e7a6bdc24')):
         if hashlib.sha256((_reference/_name).read_bytes()).hexdigest()!=_expected:
             raise RuntimeError('Reference exporter hash mismatch: '+_name)
     _tool = Path(_dist)/'runtime'
