@@ -419,6 +419,60 @@ if duplicates_to_remove:
     bpy.data.batch_remove(ids=duplicates_to_remove)
 log(f"Removed {duplicate_count} repeated placements across source layers")
 
+# --------------------------------------------------------------- 区域导出 --
+def _region_bounds():
+    """UE 厘米的框选区域 → Blender 米坐标 (x0, y0, x1, y1)；没有就返回 None。"""
+    raw = os.environ.get('ATLASMAP_REGION', '')
+    if '--region' in sys.argv:
+        try:
+            raw = sys.argv[sys.argv.index('--region') + 1]
+        except IndexError:
+            raw = ''
+    if not raw:
+        return None
+    try:
+        values = [float(part) for part in raw.replace(';', ',').split(',') if part.strip()]
+    except ValueError:
+        return None
+    if len(values) != 4:
+        return None
+    low_x, high_x = sorted((values[0], values[2]))
+    low_y, high_y = sorted((values[1], values[3]))
+    if high_x - low_x < 1 or high_y - low_y < 1:
+        return None
+    # 与导出器的坐标约定一致：Blender = (x/100, -y/100, z/100)
+    return (low_x / 100.0, -high_y / 100.0, high_x / 100.0, -low_y / 100.0)
+
+
+region = _region_bounds()
+if region:
+    kept = []
+    dropped = []
+    for item in list(scene.objects):
+        if item.type != 'MESH':
+            continue
+        matrix = item.matrix_world
+        xs, ys = [], []
+        for corner in item.bound_box:
+            world = matrix @ Vector(corner)
+            xs.append(world.x)
+            ys.append(world.y)
+        if (min(xs) <= region[2] and max(xs) >= region[0]
+                and min(ys) <= region[3] and max(ys) >= region[1]):
+            kept.append(item)
+        else:
+            dropped.append(item)
+    if dropped:
+        bpy.data.batch_remove(ids=dropped)
+    log(f"区域导出：保留 {len(kept)} 个物体，移除 {len(dropped)} 个（范围 "
+        f"X {region[0]:.1f}..{region[2]:.1f} m, Y {region[1]:.1f}..{region[3]:.1f} m）")
+    try:
+        (Path(ROOT) / 'region-report.json').write_text(json.dumps(
+            {'schema': 1, 'kept': len(kept), 'dropped': len(dropped),
+             'blenderBounds': list(region)}, ensure_ascii=False, indent=1), encoding='utf-8')
+    except OSError:
+        pass
+
 sys.path.insert(0,str(Path(__file__).parent))
 from map_surfaces import apply_blender_surfaces
 apply_blender_surfaces(ROOT,bpy.data.materials)

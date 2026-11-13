@@ -149,6 +149,20 @@ class UePage(QWidget):
         self.sp_parallel.setValue(int(self._settings.get('parallel_processes', 2)))
         self.sp_parallel.setEnabled(self.chk_parallel.isChecked())
         parallel_row.addWidget(self.sp_parallel)
+
+        region_row = QHBoxLayout()
+        self.chk_region = F.CheckBox('只导出选中区域')
+        self.chk_region.setToolTip('先在平面图上框一块，导出时只保留落在里面的分块')
+        self.chk_region.setChecked(bool(self._settings.get('ue_region')))
+        region_row.addWidget(self.chk_region)
+        self.btn_region = F.PushButton('框选…')
+        self.btn_region.setToolTip('打开平面图，拖一个矩形选保留范围')
+        self.btn_region.clicked.connect(self._pick_region)
+        region_row.addWidget(self.btn_region)
+        self.lab_region = QLabel()
+        self.lab_region.setStyleSheet('color:#9db3c6;background:transparent;')
+        region_row.addWidget(self.lab_region, 1)
+        self._refresh_region_text()
         parallel_row.addStretch(1)
         auto_box.addLayout(parallel_row)
         auto_box.addWidget(_label('开启后界面变红，独立进程分块处理地图；实际并发会按内存余量调整，每个窗口显示自己的任务。', 12))
@@ -325,6 +339,7 @@ class UePage(QWidget):
         self.sp_workers.valueChanged.connect(self._refresh)
         self.chk_parallel.toggled.connect(self._parallel_toggled)
         self.sp_parallel.valueChanged.connect(self._refresh)
+        self.chk_region.toggled.connect(self._region_toggled)
         self.chk_supplemental.toggled.connect(self._refresh)
         self.chk_game_lighting.toggled.connect(self._refresh)
         self.cb_render_view.currentIndexChanged.connect(self._save)
@@ -574,6 +589,99 @@ class UePage(QWidget):
             show_performance_effect(self.win,self.sp_parallel.value())
         self._refresh()
 
+    # ---------------------------------------------------------- 区域导出 --
+    def _region(self):
+        """返回 (minX,minY,maxX,maxY)，单位 UE 厘米；没勾就用整张图。"""
+        if not self.chk_region.isChecked():
+            return None
+        from core.region import normalize
+        return normalize(self._settings.get('ue_region'))
+
+    def _refresh_region_text(self) -> None:
+        region = self._region()
+        if not region:
+            self.lab_region.setText('整张图')
+            return
+        self.lab_region.setText('已选 %.0f m × %.0f m' % ((region[2] - region[0]) / 100,
+                                                          (region[3] - region[1]) / 100))
+
+    def _region_toggled(self, checked: bool) -> None:
+        if checked and not self._settings.get('ue_region'):
+            self._pick_region()
+            if not self._settings.get('ue_region'):
+                self.chk_region.setChecked(False)
+        self._refresh_region_text()
+        self._refresh()
+
+    def _pick_region(self) -> None:
+        from app.region_picker import RegionPicker
+        from core.region import normalize
+        name = self._map_name()
+        root = self._paths()['root']
+        dialog = RegionPicker(self, name, root, normalize(self._settings.get('ue_region')))
+        if dialog.exec() == RegionPicker.Accepted:
+            picked = dialog.picked
+            if picked:
+                self._settings['ue_region'] = list(picked)
+                self.chk_region.setChecked(True)
+            else:
+                self._settings.pop('ue_region', None)
+                self.chk_region.setChecked(False)
+            self._refresh_region_text()
+            self._refresh()
+
+    # ---------------------------------------------------------- 简单向导 --
+    def _offer_wizard(self) -> bool:
+        """导出前问一次：要不要按向导一步步来。返回 True 表示继续导出。"""
+        if self._settings.get('wizard_never'):
+            return True
+        from PySide6.QtWidgets import QApplication
+        if QApplication.platformName() in ('offscreen', 'minimal') or os.environ.get('ATLASMAP_NO_WIZARD'):
+            return True                      # 自动化/无头环境不弹窗
+        from app.simple_wizard import ask_wizard
+        choice = ask_wizard(self)
+        if choice == 'direct':
+            return True
+        if choice == 'never':
+            self._settings['wizard_never'] = True
+            try:
+                exporter.save_settings(self._settings)
+            except Exception:                                   # noqa: BLE001
+                pass
+            return True
+        return self._apply_wizard()
+
+    def _apply_wizard(self) -> bool:
+        from app.simple_wizard import SimpleWizard
+        dialog = SimpleWizard(self.win, self._map_names,
+                              {'map': self._map_name(), 'base': self.ed_root.text().strip(),
+                               'quality': self.quality.combo.currentData(),
+                               'region': self._region()})
+        if dialog.exec() != SimpleWizard.Accepted or not dialog.values:
+            return False
+        values = dialog.values
+        name = values['map']
+        index = self.cb_map.findData(name)
+        if index >= 0:
+            self.cb_map.setCurrentIndex(index)
+        else:
+            self.cb_map.setEditText(name)
+        self.ed_root.setText(values['base'])
+        quality_index = self.quality.combo.findData(values['quality'])
+        if quality_index >= 0:
+            self.quality.combo.setCurrentIndex(quality_index)
+        region = values.get('region')
+        if region:
+            self._settings['ue_region'] = list(region)
+            self.chk_region.setChecked(True)
+        else:
+            self._settings.pop('ue_region', None)
+            self.chk_region.setChecked(False)
+        self._refresh_region_text()
+        self._save()
+        self._refresh()
+        return True
+
     def _save(self) -> None:
         self._settings.update(exporter.load_settings())
         self._settings["ue_engine"] = self.ed_engine.text().strip()
@@ -588,6 +696,7 @@ class UePage(QWidget):
         self._settings["ue_workers"] = self.sp_workers.value()
         self._settings['parallel_export'] = self.chk_parallel.isChecked()
         self._settings['parallel_processes'] = self.sp_parallel.value()
+        self._settings['ue_region'] = self._region()
         self._settings['lighting_mode'] = 'supplemental' if self.chk_supplemental.isChecked() else 'source'
         self._settings['render_profile'] = 'game' if self.chk_game_lighting.isChecked() else 'source'
         self._settings['render_view'] = self.cb_render_view.currentData()
@@ -628,6 +737,7 @@ class UePage(QWidget):
             "parallel_processes": str(self.sp_parallel.value()),
             "lighting_mode": 'supplemental' if self.chk_supplemental.isChecked() else 'source',
             "render_profile": 'game' if self.chk_game_lighting.isChecked() else 'source',
+            "region": self._region(),
         }
 
     def _cmd_export(self) -> str:
@@ -843,6 +953,8 @@ class UePage(QWidget):
             return
         if getattr(self.win,'_cleanup_pending',False):
             self.shell.status('请先处理上次导出的残留文件')
+            return
+        if not self._offer_wizard():
             return
         try:
             ue_pipeline.map_roots(self._map_name())

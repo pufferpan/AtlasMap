@@ -116,6 +116,24 @@ def build_steps(p: Dict[str, str], *, max_tex: Optional[int] = None,
     def validate_source(started):
         validate_export(root,p['map'],started)
         record_quality(root,p.get('export_quality'),max_tex)
+        # 框选区域：先按 manifest 的分块包围盒裁掉不相交的 glb，再修透明，
+        # 这样 Blender 只导入选中的那一块，UE 那边也少搬一大半几何。
+        try:
+            from core.region import filter_map
+            region = p.get('region')
+            if region:
+                report = filter_map(root, region)
+                print('区域导出：保留 %d/%d 个分块，跳过 %.1f MB' % (
+                    report['kept'], report['levels'], report['removed_bytes'] / 1048576), flush=True)
+        except Exception as error:                       # noqa: BLE001
+            print('区域裁剪失败（继续导出整张图）：',str(error)[:300],flush=True)
+        # 贴花 / 树叶 / 纱网的 alpha 被导出器写成了 OPAQUE，按贴图重新判定。
+        # 放在这里是因为 Blender 与 UE 两条链都从这一步分叉，改完两边都吃到。
+        try:
+            from core.split_materials import repair_split
+            repair_split(root,log=print)
+        except Exception as error:                       # noqa: BLE001 - 修不动也不能让整张图失败
+            print('修正贴图透明通道失败（继续导出）：',str(error)[:300],flush=True)
 
     steps: List[Step] = []
 
