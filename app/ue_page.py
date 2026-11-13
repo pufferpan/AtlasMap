@@ -232,6 +232,10 @@ class UePage(QWidget):
         self.btn_current_map = F.PushButton("使用地图库所选地图")
         self.btn_current_map.clicked.connect(self._use_current_map)
         map_row.addWidget(self.btn_current_map)
+        self.btn_generic = F.PushButton("其他游戏…")
+        self.btn_generic.setToolTip("导出任意 UE 游戏的单张 .umap；加密的包会一个个问我要密钥")
+        self.btn_generic.clicked.connect(self._open_generic)
+        map_row.addWidget(self.btn_generic)
         env_box.addLayout(map_row)
         initial_map = self._map_name()
         self.ed_dest = self._row(env_box, "UE 资源目录",
@@ -451,6 +455,13 @@ class UePage(QWidget):
         self._fill_maps(selected)
         self._refresh()
         self.shell.status(f"扫描完成：{len(result)} 张地图，可搜索中文名或代号")
+
+    def _open_generic(self) -> None:
+        """其他游戏（通用 UE 工程）：单独一个对话框，不动当前地图库。"""
+        from app.generic_dialog import GenericDialog
+        dialog = GenericDialog(self, oodle=str(self._settings.get("oodle") or ""),
+                               blender=self.ed_blender.text().strip())
+        dialog.exec()
 
     def _use_current_map(self) -> None:
         name = self.win.map_page._current

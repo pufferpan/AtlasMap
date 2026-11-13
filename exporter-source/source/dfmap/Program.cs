@@ -50,6 +50,8 @@ public static class Program
         {
             case "keys": return CmdKeys();
             case "paks": return CmdPaks();
+            case "probe": return CmdProbe(rest);
+            case "umap": return CmdUmap(rest);
             case "find": return CmdFind(rest);
             case "maps": return CmdMaps(rest);
             case "api": return Inspect.CmdApi(rest);
@@ -150,9 +152,64 @@ public static class Program
     {
         if (_keys is not null) return _keys;
         if (!File.Exists(_cfg.KeyFile))
-            throw new FileNotFoundException($"AES key file not found: {_cfg.KeyFile}\n  fetch it from {_cfg.KeyUrl}");
+        {
+            // 未加密的游戏不需要密钥；加密的包会在 probe 里单独报出来，由 GUI 逐个询问。
+            Console.Error.WriteLine($"[atlas] no key file at '{_cfg.KeyFile}'; only unencrypted archives can mount");
+            _keys = new AesKeySet { Version = "none", MainKey = "" };
+            return _keys;
+        }
         _keys = AesKeySet.Load(_cfg.KeyFile);
         return _keys;
+    }
+
+    /// <summary>
+    /// 报出每个归档是否需要密钥。已挂载 = 密钥正确；UnloadedVfs 里 IsEncrypted 的 = 还需要密钥
+    /// （GUID 全零表示用主密钥）。JSON 输出给 GUI 逐个询问。
+    /// </summary>
+    private static int CmdProbe(string[] args)
+    {
+        var k = Keys();
+        using var provider = Mount.Create(_cfg, k);
+        var archives = new List<object>();
+        foreach (var v in provider.MountedVfs)
+            archives.Add(new { file = Path.GetFileName(v.Name), encrypted = v.IsEncrypted,
+                               guid = v.EncryptionKeyGuid.ToString(), mounted = true });
+        foreach (var v in provider.UnloadedVfs)
+            archives.Add(new { file = Path.GetFileName(v.Name), encrypted = v.IsEncrypted,
+                               guid = v.EncryptionKeyGuid.ToString(), mounted = false });
+        var result = new
+        {
+            game = _cfg.Game,
+            paksDirectory = _cfg.PaksDirectory,
+            mounted = provider.MountedVfs.Count,
+            files = provider.Files.Count,
+            archives,
+        };
+        var json = JsonConvert.SerializeObject(result, Formatting.Indented);
+        if (args.Length > 0) File.WriteAllText(args[0], json);
+        Console.WriteLine(json);
+        return provider.Files.Count > 0 ? 0 : 3;
+    }
+
+    /// <summary>
+    /// 导出任意游戏的一张 .umap，产物与 merge 相同（split/*.glb + manifest.json），
+    /// 后面的 Blender 导入链不需要改。
+    /// </summary>
+    private static int CmdUmap(string[] args)
+    {
+        if (args.Length < 2) { Console.Error.WriteLine("usage: dfmap umap <vpath/Map.umap> <outDir>"); return 2; }
+        var vpath = args[0].Replace('\\', '/');
+        var outDir = args[1];
+        var k = Keys();
+        using var provider = Mount.Create(_cfg, k);
+        if (!provider.Files.Keys.Any(p => string.Equals(p, vpath, StringComparison.OrdinalIgnoreCase)))
+        {
+            Console.Error.WriteLine($"[dfmap] no such map: {vpath}");
+            return 4;
+        }
+        var map = Path.GetFileNameWithoutExtension(vpath);
+        Console.WriteLine($"[dfmap] exporting single map {vpath} -> {outDir}");
+        return Merge.CmdMerge(provider, new[] { map, outDir, "--root", vpath, "--all", "--split" });
     }
 
     private static int CmdKeys()

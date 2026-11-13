@@ -27,7 +27,8 @@ public sealed class AesKeySet
 
     public IEnumerable<KeyValuePair<FGuid, FAesKey>> ToPairs()
     {
-        yield return new KeyValuePair<FGuid, FAesKey>(new FGuid(0u), new FAesKey(MainKey));
+        if (!string.IsNullOrWhiteSpace(MainKey))
+            yield return new KeyValuePair<FGuid, FAesKey>(new FGuid(0u), new FAesKey(MainKey));
         foreach (var k in Keys)
         {
             if (string.IsNullOrWhiteSpace(k.Key) || string.IsNullOrWhiteSpace(k.Guid)) continue;
