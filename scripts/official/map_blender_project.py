@@ -131,8 +131,16 @@ def source_lighting(bpy,path):
             break
         except TypeError:
             continue
-    exposure=0.0 if sun<=0 else max(-3.0,min(2.0,-math.log2(max(sun,0.01)/3.0)))
+    sky=photometry.sky_strength(sky_intensity)
+    exposure=photometry.exposure_ev(sun,sky)
     scene.view_settings.exposure=exposure
+    # EEVEE：开光追与快速 GI，让室内不靠环境光"平"着亮
+    for attribute,value in (('use_raytracing',True),('use_fast_gi',True),
+                            ('fast_gi_method','GLOBAL_ILLUMINATION'),('use_shadows',True)):
+        try:
+            setattr(scene.eevee,attribute,value)
+        except (AttributeError,TypeError):
+            pass
     return dict(created=created,unsupported=unsupported,
         photometric_compatibility='Lumens/lux → watts via 683 lm/W; original UE values kept on each object',
         sun_strength=sun,sky_strength=photometry.sky_strength(sky_intensity),
