@@ -619,6 +619,18 @@ class ToolsPage(QWidget):
         row2.addStretch(1)
         card2.box.addLayout(row2)
         lay.addWidget(card2)
+
+        card3 = Section("临时文件")
+        card3.box.addWidget(_label("清掉导出留下的预览缓存、分块原始文件（source-render/raw）、旧任务配置和旧日志。"
+                                   "只动工具自己的目录，导出目录之外的东西一律不碰。", 12, False, "#9fb3c8"))
+        row3 = QHBoxLayout()
+        b7 = F.PushButton("清理临时文件…")
+        b7.setFixedHeight(_px(34))
+        b7.clicked.connect(self._cleanup)
+        row3.addWidget(b7)
+        row3.addStretch(1)
+        card3.box.addLayout(row3)
+        lay.addWidget(card3)
         lay.addStretch(1)
 
     def _run(self, title: str, argv: List[str]) -> None:
@@ -627,6 +639,25 @@ class ToolsPage(QWidget):
             self.host.status("没找到 map-export.exe，先去「设置」里指定")
             return
         self.host.run_job(title, exporter._base_cmd(exe) + argv)
+
+    def _cleanup(self) -> None:
+        start = exporter.load_settings().get("outdir", "")
+        folder = QFileDialog.getExistingDirectory(self, "选择要清理的导出目录", start)
+        if not folder:
+            return
+        from core import cleanup
+        plan = cleanup.plan(folder)
+        if not plan["items"]:
+            self.host.status("这个目录没有可清理的临时文件")
+            return
+        size = int(plan["size"]) / (1024 ** 3)
+        if not F.confirm(self, "清理临时文件",
+                         f"将删除 {len(plan['items'])} 项、约 {size:.2f} GB 的中间产物；"
+                         "包括预览缓存、source-render/raw、旧任务配置和旧日志。"
+                         "已经导出的 split/*.glb 与 .blend 不会动。"):
+            return
+        result = cleanup.clean(folder, log=self.host.status)
+        self.host.status(cleanup.describe(result))
 
     def _open_tool_dir(self) -> None:
         exe = exporter.find_exe()
@@ -805,6 +836,14 @@ class SettingsPage(QWidget):
         card2.box.addLayout(row)
         lay.addWidget(card2)
 
+        card4 = Section("导出后清理")
+        self.cb_auto = F.CheckBox("导出成功后自动清理临时文件（预览缓存、分块原始文件、旧任务配置与旧日志）")
+        self.cb_auto.setChecked(True)
+        card4.box.addWidget(self.cb_auto)
+        self.cb_keepraw = F.CheckBox("保留 source-render/raw（只在需要重新生成 Blender 工程时才有用）")
+        card4.box.addWidget(self.cb_keepraw)
+        lay.addWidget(card4)
+
         row3 = QHBoxLayout()
         save = F.PrimaryPushButton("保存")
         save.setFixedHeight(_px(36))
@@ -871,6 +910,8 @@ class SettingsPage(QWidget):
         self.out_edit.setText(str(s.get("outdir") or ""))
         self.blend_edit.setText(str(s.get("blender") or ""))
         self.game_edit.setText(str(s.get("game") or "GAME_DeltaForce"))
+        self.cb_auto.setChecked(bool(s.get("auto_clean", True)))
+        self.cb_keepraw.setChecked(bool(s.get("keep_raw", False)))
         if not self.exe_edit.text():
             found = exporter.find_exe()
             if found:
@@ -884,6 +925,8 @@ class SettingsPage(QWidget):
         data["outdir"] = self.out_edit.text().strip()
         data["blender"] = self.blend_edit.text().strip()
         data["game"] = self.game_edit.text().strip() or "GAME_DeltaForce"
+        data["auto_clean"] = self.cb_auto.isChecked()
+        data["keep_raw"] = self.cb_keepraw.isChecked()
         exporter.save_settings(data)
         exporter.write_exporter_config(data)
         self.host.status("设置已保存")

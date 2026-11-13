@@ -456,6 +456,26 @@ class UePage(QWidget):
         self._refresh()
         self.shell.status(f"扫描完成：{len(result)} 张地图，可搜索中文名或代号")
 
+    def _cleanup_after_export(self, root: str, map_name: str) -> None:
+        """导出成功后清掉预览缓存、分块原始文件等中间产物（可在设置里关）。"""
+        settings = exporter.load_settings()
+        if not bool(settings.get('auto_clean', True)):
+            return
+        keep_raw = bool(settings.get('keep_raw', False))
+        from core import cleanup
+        try:
+            self.shell.status('正在清理临时文件…')
+            result = cleanup.clean(root, include_raw=not keep_raw)
+        except OSError as error:
+            self.shell.status('临时文件清理失败：' + str(error))
+            return
+        message = cleanup.describe(result)
+        self.shell.status(message)
+        try:
+            self.win.feed(message)
+        except Exception:                                   # noqa: BLE001
+            pass
+
     def _open_generic(self) -> None:
         """其他游戏（通用 UE 工程）：单独一个对话框，不动当前地图库。"""
         from app.generic_dialog import GenericDialog
@@ -1078,6 +1098,7 @@ class UePage(QWidget):
                                      max_tex=int(p.get('max_tex',0) or 0))
                 except (OSError, ValueError, TypeError):
                     pass
+                self._cleanup_after_export(root, p['map'])
             try:
                 # 「打开」直接指到刚生成的 .uproject（在资源管理器里选中它），
                 # 找不到就退到工程目录

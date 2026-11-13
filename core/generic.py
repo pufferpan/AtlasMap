@@ -85,19 +85,21 @@ def write_config(path: str, game_root: str, profile: str = "GAME_UE5_3", *,
 # ------------------------------------------------------------------- 探密钥 --
 def probe(exe: str, config: str, timeout: int = 300) -> Tuple[int, Optional[dict], str]:
     """跑 `probe`，返回 (退出码, 解析后的 JSON, stderr 末尾几行)。"""
-    out = Path(tempfile.mkdtemp(prefix="atlasmap-probe-")) / "probe.json"
-    command = [exe, "--config", config, "probe", str(out)]
-    try:
-        run = subprocess.run(command, capture_output=True, text=True, timeout=timeout,
-                             encoding="utf-8", errors="replace")
-    except OSError as exc:
-        return 2, None, str(exc)
-    data = None
-    if out.is_file():
+    # 探测目录用完就删：以前每次「检测 / 填密钥」都会在 %TEMP% 留一个空壳目录。
+    with tempfile.TemporaryDirectory(prefix="atlasmap-probe-") as folder:
+        out = Path(folder) / "probe.json"
+        command = [exe, "--config", config, "probe", str(out)]
         try:
-            data = json.loads(out.read_text(encoding="utf-8-sig"))
-        except (OSError, ValueError):
-            data = None
+            run = subprocess.run(command, capture_output=True, text=True, timeout=timeout,
+                                 encoding="utf-8", errors="replace")
+        except OSError as exc:
+            return 2, None, str(exc)
+        data = None
+        if out.is_file():
+            try:
+                data = json.loads(out.read_text(encoding="utf-8-sig"))
+            except (OSError, ValueError):
+                data = None
     if data is None:
         start = run.stdout.find("{")
         if start >= 0:
