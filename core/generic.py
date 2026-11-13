@@ -179,8 +179,45 @@ def list_maps(exe: str, config: str, limit: int = 0, timeout: int = 600) -> Tupl
 
 
 # ------------------------------------------------------------------ 导出 --
+def _instances(out_dir: str) -> tuple:
+    """返回 (levels, instances)，manifest 不存在时当 0。"""
+    path = os.path.join(out_dir, "split", "manifest.json")
+    try:
+        with open(path, encoding="utf-8-sig") as stream:
+            data = json.load(stream)
+    except (OSError, ValueError):
+        return 0, 0
+    levels = data.get("levels") or []
+    return len(levels), sum(int(row.get("instances") or 0) for row in levels)
+
+
 def export_map(exe: str, config: str, vpath: str, out_dir: str, *,
                timeout: int = 3600) -> subprocess.CompletedProcess:
-    return subprocess.run([exe, "--config", config, "umap", vpath, out_dir],
-                          capture_output=True, text=True, timeout=timeout,
-                          encoding="utf-8", errors="replace")
+    """导出一个 .umap。
+
+    UE 的关卡常常把真正的东西放在同目录的子关卡里，只按这个文件当 root 会导出空场景；
+    所以第一次结果里一个实例都没有时，自动退回「整个目录」再导一次。
+    """
+    first = subprocess.run([exe, "--config", config, "umap", vpath, out_dir],
+                           capture_output=True, text=True, timeout=timeout,
+                           encoding="utf-8", errors="replace")
+    if first.returncode != 0:
+        return first
+    levels, instances = _instances(out_dir)
+    if instances > 0:
+        return first
+    folder = vpath.rsplit("/", 1)[0] + "/"
+    if not folder or folder == vpath:
+        return first
+    second = subprocess.run([exe, "--config", config, "merge", folder, out_dir,
+                             "--root", folder, "--all", "--split"],
+                            capture_output=True, text=True, timeout=timeout,
+                            encoding="utf-8", errors="replace")
+    if second.returncode != 0:
+        return first
+    merged = subprocess.CompletedProcess(
+        first.args, 0,
+        (first.stdout or "") + "\n[generic] 单文件没有实例，已改用上级目录重新导出：\n"
+        + (second.stdout or ""),
+        (first.stderr or "") + (second.stderr or ""))
+    return merged

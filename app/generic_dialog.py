@@ -314,6 +314,11 @@ class GenericDialog(W.FramelessDialog):
             (Path(dest) / "export.log").write_text(log, encoding="utf-8")
             if run.returncode != 0:
                 raise RuntimeError(f"导出器退出码 {run.returncode}：" + log[-400:])
+            levels, instances = generic._instances(dest)
+            if instances == 0:
+                raise RuntimeError(
+                    "这张 .umap 和它所在目录都没有可导出的网格（可能是纯配置关卡）。"
+                    "换一张地图，或者先确认包的引擎版本选对了。")
             blend = Path(dest) / "scene_no_terrain.blend"
             if blender and os.path.isfile(blender) and os.path.isfile(script):
                 import subprocess
@@ -321,10 +326,13 @@ class GenericDialog(W.FramelessDialog):
                        "-P", script, "--", dest, "--flat-split"]
                 proc = subprocess.run(cmd, capture_output=True, text=True, timeout=3600,
                                       encoding="utf-8", errors="replace")
-                (Path(dest) / "blender.log").write_text(
-                    (proc.stdout or "") + "\n" + (proc.stderr or ""), encoding="utf-8")
+                text = (proc.stdout or "") + "\n" + (proc.stderr or "")
+                (Path(dest) / "blender.log").write_text(text, encoding="utf-8")
                 if proc.returncode != 0:
-                    raise RuntimeError("Blender 导入失败，详见 blender.log")
+                    tail = [line for line in text.splitlines() if line.strip()][-6:]
+                    raise RuntimeError("Blender 导入失败（退出码 %d）：\n%s\n完整日志：%s"
+                                       % (proc.returncode, "\n".join(tail),
+                                          Path(dest) / "blender.log"))
             return str(blend) if blend.is_file() else dest
 
         def after(result) -> None:

@@ -474,9 +474,17 @@ if region:
         pass
 
 sys.path.insert(0,str(Path(__file__).parent))
-from map_surfaces import apply_blender_surfaces
-apply_blender_surfaces(ROOT,bpy.data.materials)
-preview.add(scene.objects,replace=True,force=True,complete=True)
+# 材质修补依赖游戏自己的贴图布局；换成别的游戏时可能整段抛错，但几何本身是好的，
+# 所以这里只记日志不中断，保证 scene_no_terrain.blend 一定写得出来。
+try:
+    from map_surfaces import apply_blender_surfaces
+    apply_blender_surfaces(ROOT,bpy.data.materials)
+except Exception as _exc:                                    # noqa: BLE001
+    log(f"材质修补跳过：{type(_exc).__name__}: {_exc}")
+try:
+    preview.add(scene.objects,replace=True,force=True,complete=True)
+except Exception as _exc:                                    # noqa: BLE001
+    log(f"预览同步跳过：{type(_exc).__name__}: {_exc}")
 
 # The CDLOD mesh comes entirely from stored height samples and visibility bits.
 # 本机没跑 iceland_terrain.py（没有 CDLOD 地形诊断数据）时允许跳过，不要整段崩

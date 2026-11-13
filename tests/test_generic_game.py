@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from core import generic as g
+from core import generic
 
 
 class GenericSupportTests(unittest.TestCase):
@@ -78,3 +81,51 @@ class GenericSupportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExportFallbackTest(unittest.TestCase):
+    """只给一个 .umap 时，若没有实例就退回上级目录重导。"""
+
+    def _manifest(self, folder, levels, instances):
+        Path(folder, "split").mkdir(parents=True, exist_ok=True)
+        rows = [{"file": f"{i:03d}_L{i}", "level": f"L{i}", "instances": instances}
+                for i in range(levels)]
+        Path(folder, "split", "manifest.json").write_text(
+            json.dumps({"levels": rows}), encoding="utf-8")
+
+    def test_instances_reads_manifest(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            self.assertEqual(generic._instances(tmp), (0, 0))
+            self._manifest(tmp, 3, 4)
+            self.assertEqual(generic._instances(tmp), (3, 12))
+
+    def test_empty_single_file_falls_back_to_folder(self):
+        calls = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if "merge" in cmd:                             # 只有退回目录才有实例
+                self._manifest(cmd[-1], 2, 5)
+            return subprocess.CompletedProcess(cmd, 0, "ok", "")
+
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(generic.subprocess, "run", side_effect=fake_run):
+            run = generic.export_map("exe", "cfg", "Game/Content/ZP/L_HE.uasset", tmp)
+        self.assertEqual(run.returncode, 0)
+        self.assertEqual(len(calls), 2)
+        self.assertIn("merge", calls[1])
+        self.assertIn("Game/Content/ZP/", calls[1])
+        self.assertIn("改用上级目录", run.stdout)
+
+    def test_single_file_with_instances_is_kept(self):
+        calls = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            self._manifest(cmd[-1], 1, 7)
+            return subprocess.CompletedProcess(cmd, 0, "ok", "")
+
+        with tempfile.TemporaryDirectory() as tmp, \
+                mock.patch.object(generic.subprocess, "run", side_effect=fake_run):
+            generic.export_map("exe", "cfg", "Game/A/B.umap", tmp)
+        self.assertEqual(len(calls), 1)
