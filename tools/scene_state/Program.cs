@@ -21,7 +21,7 @@ var output = Path.GetFullPath(args[3]);
 Directory.CreateDirectory(output);
 if (!exportChunk && !scanChunk && !environmentOnly && !reflectionOnly && !runtimeOnly)
     File.WriteAllText(Path.Combine(output,"state-index.json"),"{\"complete\":false}");
-var expected = "f5a909824c021b27ff5a76d94e1b5a3f01db85b09d84568e9b990d327cbc6ac7";
+var expected = "23642525d210d158cb6a57ffd6e3258e6e5fbbb6d4cb2dbfd91c6f3376b3f103";
 var binary = Path.Combine(reference, "dfmap.dll");
 string Hash(byte[] bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
 if (Hash(File.ReadAllBytes(binary)) != expected) throw new InvalidDataException("dfmap.dll differs from the required exporter");
