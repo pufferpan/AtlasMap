@@ -149,6 +149,11 @@ class UePage(QWidget):
         self.sp_parallel.setValue(int(self._settings.get('parallel_processes', 2)))
         self.sp_parallel.setEnabled(self.chk_parallel.isChecked())
         parallel_row.addWidget(self.sp_parallel)
+        self.chk_memlimit = F.CheckBox('按内存余量限制并发')
+        self.chk_memlimit.setChecked(bool(self._settings.get('mem_limit', True)))
+        self.chk_memlimit.setToolTip('勾选：按当前可用物理内存和提交内存自动收紧并发，避免进程多到把内存吃光；'
+                                     '不勾：严格按上面的「并行进程数量」跑（内存不够时仍会降为单进程重试）')
+        parallel_row.addWidget(self.chk_memlimit)
 
         region_row = QHBoxLayout()
         self.chk_region = F.CheckBox('只导出选中区域')
@@ -165,7 +170,7 @@ class UePage(QWidget):
         self._refresh_region_text()
         parallel_row.addStretch(1)
         auto_box.addLayout(parallel_row)
-        auto_box.addWidget(_label('开启后界面变红，独立进程分块处理地图；实际并发会按内存余量调整，每个窗口显示自己的任务。', 12))
+        auto_box.addWidget(_label('开启后界面变红，独立进程分块处理地图；默认会按内存余量收紧并发，可用「按内存余量限制并发」关掉，每个窗口显示自己的任务。', 12))
         self.chk_game_lighting = F.CheckBox("游戏光照兼容：抑制泛白并保留高光细节")
         self.chk_game_lighting.setChecked(self._settings.get('render_profile','game')=='game')
         self.chk_game_lighting.setToolTip('作用于导入后的 UE 工程和预览；原始灯光与烘焙数据保持不变。游戏专用 PRT 仍存在兼容差异。')
@@ -613,6 +618,7 @@ class UePage(QWidget):
                 self.chk_parallel.blockSignals(False)
                 enabled = False
         self.sp_parallel.setEnabled(enabled)
+        self.chk_memlimit.setEnabled(enabled)
         if hasattr(self.win, 'set_parallel_theme'):
             self.win.set_parallel_theme(enabled)
         if enabled:
@@ -727,6 +733,7 @@ class UePage(QWidget):
         self._settings["ue_workers"] = self.sp_workers.value()
         self._settings['parallel_export'] = self.chk_parallel.isChecked()
         self._settings['parallel_processes'] = self.sp_parallel.value()
+        self._settings['mem_limit'] = self.chk_memlimit.isChecked()
         self._settings['ue_region'] = self._region()
         self._settings['lighting_mode'] = 'supplemental' if self.chk_supplemental.isChecked() else 'source'
         self._settings['render_profile'] = 'game' if self.chk_game_lighting.isChecked() else 'source'
@@ -766,6 +773,7 @@ class UePage(QWidget):
             "workers": str(self.sp_workers.value()),
             "parallel_export": '1' if self.chk_parallel.isChecked() else '0',
             "parallel_processes": str(self.sp_parallel.value()),
+            "mem_limit": '1' if self.chk_memlimit.isChecked() else '0',
             "lighting_mode": 'supplemental' if self.chk_supplemental.isChecked() else 'source',
             "render_profile": 'game' if self.chk_game_lighting.isChecked() else 'source',
             "region": self._region(),

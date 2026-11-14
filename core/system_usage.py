@@ -60,7 +60,21 @@ class SystemUsage:
         return result
 
 
-def ue_process_capacity(requested,snapshot=None):
+def memory_aware(default=True):
+    """设置里的「按内存余量自动限制并发」；读不到设置就按默认。"""
+    try:
+        from core import exporter
+        return bool(exporter.load_settings().get('mem_limit', default))
+    except Exception:                                       # noqa: BLE001
+        return default
+
+
+def ue_process_capacity(requested,snapshot=None,limit_by_memory=None):
+    requested=max(1,int(requested))
+    if limit_by_memory is None:
+        limit_by_memory=memory_aware()
+    if not limit_by_memory:
+        return requested
     snapshot=SystemUsage().sample() if snapshot is None else snapshot
     physical=snapshot.get('memory_available');commit=snapshot.get('commit_available')
     if physical is None or commit is None:return min(requested,2)
@@ -78,9 +92,13 @@ def ue_import_memory(manifest,mesh_bytes):
     return max(4*1024**3,pixels*16+int(mesh_bytes)*2+1024**3)
 
 
-def ue_import_capacity(requested,costs,snapshot=None):
+def ue_import_capacity(requested,costs,snapshot=None,limit_by_memory=None):
+    if limit_by_memory is None:
+        limit_by_memory=memory_aware()
+    if not limit_by_memory:
+        return max(1,int(requested))
     snapshot=SystemUsage().sample() if snapshot is None else snapshot
-    limit=ue_process_capacity(requested,snapshot)
+    limit=ue_process_capacity(requested,snapshot,True)
     physical=snapshot.get('memory_available');commit=snapshot.get('commit_available')
     if not costs or physical is None or commit is None:return min(limit,1)
     budget=min(max(0,physical-1024**3),max(0,commit-2*1024**3))
