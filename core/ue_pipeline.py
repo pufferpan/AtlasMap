@@ -8,6 +8,7 @@ import os
 import json
 import re
 import uuid
+import queue
 import subprocess
 import threading
 import time
@@ -530,8 +531,32 @@ class Pipeline:
             assert proc.stdout is not None
             disk_failure=False
             memory_failure=False
-            for raw in proc.stdout:
-                line = raw.rstrip("\r\n")
+            stalled=False
+            last_line=''
+            last_seen=time.time()
+            stall_seconds=float(os.environ.get('ATLASMAP_STALL_SECONDS','900') or 900)
+            stall_seconds=max(2.0,stall_seconds)
+            pending_lines: "queue.Queue[object]" = queue.Queue()
+            def pump(stream=proc.stdout) -> None:
+                try:
+                    for chunk in stream:
+                        pending_lines.put(chunk)
+                except Exception:                            # noqa: BLE001
+                    pass
+                finally:
+                    pending_lines.put(None)
+            threading.Thread(target=pump,daemon=True).start()
+            while True:
+                try:
+                    raw=pending_lines.get(timeout=2.0)
+                except queue.Empty:
+                    raw=''
+                if raw is None:
+                    break
+                line=str(raw).rstrip(chr(13)+chr(10))
+                if line:
+                    last_line=line
+                    last_seen=time.time()
                 if any(token in line.lower() for token in ('no space left on device','磁盘空间不足','not enough space on the disk','map_disk_full','disk full','0x80070070')):
                     disk_failure=True
                 from core.export_failure import classify
@@ -540,8 +565,19 @@ class Pipeline:
                     memory_failure=True
                 if line.strip():
                     self._emit(line)
+                if proc.poll() is None and time.time()-last_seen>stall_seconds:
+                    stalled=True
+                    self._emit(f'[进程卡住] {stall_seconds/60:.0f} 分钟没有任何新日志，已终止：{os.path.basename(step.cmd[0])}（PID={proc.pid}）')
+                    if last_line:
+                        self._emit(f'[进程卡住] 最后一行：{last_line[:400]}')
+                    self._emit('[进程卡住] 已完成的资产会保留，重新导出会自动跳过它们继续；若每次都卡在同一处，请把上面这行日志发给开发者。')
+                    from core.process_control import terminate_processes
+                    terminate_processes([proc],self._emit)
+                    break
             proc.stdout.close()
             rc = proc.wait()
+            if stalled:
+                rc=-7
             guard.stop()
             disk_failure=disk_failure or bool(guard.error)
             if disk_failure:
