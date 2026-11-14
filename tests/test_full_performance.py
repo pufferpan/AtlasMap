@@ -151,9 +151,9 @@ class StorageTests(unittest.TestCase):
         finally:release.set();pipe.stop();pipe._thread.join(8)
     def test_unreal_parallelism_respects_ram_and_commit_headroom(self):
         gb=1024**3
-        self.assertEqual(ue_process_capacity(8,dict(memory_available=10*gb,commit_available=14*gb)),2)
-        self.assertEqual(ue_process_capacity(8,dict(memory_available=40*gb,commit_available=60*gb)),8)
-        self.assertEqual(ue_process_capacity(8,dict(memory_available=2*gb,commit_available=4*gb)),1)
+        self.assertEqual(ue_process_capacity(8,dict(memory_available=10*gb,commit_available=14*gb),limit_by_memory=True),2)
+        self.assertEqual(ue_process_capacity(8,dict(memory_available=40*gb,commit_available=60*gb),limit_by_memory=True),8)
+        self.assertEqual(ue_process_capacity(8,dict(memory_available=2*gb,commit_available=4*gb),limit_by_memory=True),1)
 
     def test_heavy_jobs_start_first_without_changing_worker_log_identity(self):
         lines=[]

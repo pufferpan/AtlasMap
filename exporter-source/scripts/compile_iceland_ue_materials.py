@@ -3,7 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 
-ROOT=Path('D:/AtlasMap-tooling/out/Iceland/ue_transfer/20261031')
+ROOT=Path('E:/dfmap-tool-20260930/out/Iceland/ue_transfer/20261031')
 manifest=json.loads((ROOT/'manifest.json').read_text(encoding='utf-8'))
 source_materials={m['id']:m for m in manifest['materials']}
 source_meshes={m['id']:m for m in manifest['meshes']}
@@ -115,6 +115,26 @@ class Generator:
             shaped=self.temporary(3,f'float3({t.code}.x*{strength},-{t.code}.y*{strength},lerp(1.0,{t.code}.z,saturate({strength})))')
             world=self.temporary(3,f'normalize(mul({shaped.code},Parameters.TangentToWorld))')
             result=Ref(3,f'float3({world.code}.x,-{world.code}.y,{world.code}.z)')
+        elif typ=='ATTRIBUTE':
+            # ShaderNodeAttribute：读顶点色（Col / Vertex Color）或自定义属性。
+            # 顶点色我们本来就导出成 VC，可以直连；其他属性没有数据来源，退化成 0，
+            # 但绝不能让整块材质编译失败（Dam_Iris_Long3 就是死在这里）。
+            scope=n.get('attribute_type','GEOMETRY')
+            attribute=(n.get('attribute_name') or '').lower()
+            if scope!='GEOMETRY':
+                raise RuntimeError('Unsupported attribute scope '+str(scope))
+            if attribute in ('','col','color','col0','vertexcolor','vertex_color','vc'):
+                self.globals.add('VC')
+                if socket=='Color':result=Ref(4,'VC')
+                elif socket=='Vector':result=Ref(3,'float3(VC.r,VC.g,VC.b)')
+                elif socket in ('Fac','Alpha'):result=Ref(1,'VC.a')
+                else:raise RuntimeError('Unsupported attribute output '+socket)
+            else:
+                print('[atlas] WARN attribute '+repr(attribute)+' has no data source; using zero',
+                      flush=True)
+                if socket=='Color':result=Ref(4,'float4(0,0,0,0)')
+                elif socket=='Vector':result=Ref(3,'float3(0,0,0)')
+                else:result=Ref(1,'0.0')
         else:raise RuntimeError('Unsupported contributing node '+typ)
         self.cache[key]=result;return result
     def texture_coordinates(self,texture):
